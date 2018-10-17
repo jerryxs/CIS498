@@ -1,8 +1,18 @@
+/*
+Should we be doing all this in our main file or should we be sending this out
+to different files and functions so that it looks a lot cleaner and a lot more
+professional?
+*/
+
+
 import React from 'react';
 import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
 
 export default class App extends React.Component {
-	var fs = require('fs')
+	//creating path to JSON file
+	var RNFS = require('react-native-fs')
+	var path = RNFS."http://127.0.0.1:82/EManage/assets/Data.json"
+	//state of assets
 	constructor(){
 		super();
 		this.state = {
@@ -14,6 +24,7 @@ export default class App extends React.Component {
 			gndr: 'Sex:'
 		};
 	}
+	//putting input values into the state
 	onChangeLicNum(value){
 			this.setState({
 				licNum:value
@@ -46,9 +57,14 @@ export default class App extends React.Component {
 				gndr:value
 			});
 	}
+	//sending it to the JSON file
+	//this should check to make sure that all fields are filled
+	//we also need to check for duplicates before Sending the info to the JSON file
 	onPressEnterData(){
-		var data = JSON.stringify(state, null, 2)
-		fs.writeFile('Data.json', data)
+		//var data = JSON.stringify(state, null, 2)
+		//fs.writeFile('Data.json', data)
+		alert(this.state.fName)
+		RNFS.writeFile(path, this.state.fName)
 	}
 
   render() {
@@ -106,10 +122,11 @@ export default class App extends React.Component {
 			 onChangeText={(value) => this.onChangeGndr(value)}
 
 		/>
+		//Button to submit data to JSON file
 		<Button
-			onPress={onPressEnterData}
+			onPress={this.onPressEnterData()}
 			title="Submit"
-			color='gray'
+			color='purple'
 		/>
 
       </View>
