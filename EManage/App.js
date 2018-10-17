@@ -9,9 +9,9 @@ import React from 'react';
 import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
 
 export default class App extends React.Component {
-	//creating path to JSON file
-	var RNFS = require('react-native-fs')
-	var path = RNFS."http://127.0.0.1:82/EManage/assets/Data.json"
+
+
+
 	//state of assets
 	constructor(){
 		super();
@@ -61,10 +61,18 @@ export default class App extends React.Component {
 	//this should check to make sure that all fields are filled
 	//we also need to check for duplicates before Sending the info to the JSON file
 	onPressEnterData(){
-		//var data = JSON.stringify(state, null, 2)
-		//fs.writeFile('Data.json', data)
 		alert(this.state.fName)
-		RNFS.writeFile(path, this.state.fName)
+		fetch('http://127.0.0.1:82/EManage/assets/Data.json',{
+			method: 'POST',
+			header: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				firstParam: this.state.fName
+			}),
+		});
+
 	}
 
   render() {
