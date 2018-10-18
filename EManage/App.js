@@ -6,7 +6,7 @@ professional?
 
 
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, wait } from 'react-native';
 
 export default class App extends React.Component {
 
@@ -19,8 +19,10 @@ export default class App extends React.Component {
 			licNum: 'License Number',
 			fName: 'First Name:',
 			lName: 'Last Name:',
+			dob:	'Date of Birth',
 			street: 'Address:',
-			sttwn: 'Town/State:',
+			town: 'Town',
+			st8: 'State:',
 			gndr: 'Sex:'
 		};
 	}
@@ -42,14 +44,25 @@ export default class App extends React.Component {
 			});
 	}
 
+	onChangeDOB(value){
+			this.setState({
+				dob:value
+			});
+	}
+
 	onChangeStreet(value){
 			this.setState({
 				street:value
 			});
 	}
-	onChangeStTwn(value){
+	onChangeTown(value){
 			this.setState({
-				sttwn:value
+				town:value
+			});
+	}
+	onChangeSt8(value){
+			this.setState({
+				st8:value
 			});
 	}
 	onChangeGndr(value){
@@ -61,8 +74,18 @@ export default class App extends React.Component {
 	//this should check to make sure that all fields are filled
 	//we also need to check for duplicates before Sending the info to the JSON file
 	onPressEnterData(){
+//alerts to see if info being saved to state
+		alert(this.state.gndr)
+		alert(this.state.st8)
+		alert(this.state.town)
+		alert(this.state.street)
+		alert(this.state.dob)
+		alert(this.state.lName)
 		alert(this.state.fName)
-		fetch('http://127.0.0.1:82/EManage/assets/Data.json',{
+		alert(this.state.licNum)
+
+
+		/*fetch('http://127.0.0.1:82/EManage/assets/Data.json',{
 			method: 'POST',
 			header: {
 				Accept: 'application/json',
@@ -71,7 +94,7 @@ export default class App extends React.Component {
 			body: JSON.stringify({
 				firstParam: this.state.fName
 			}),
-		});
+		});*/
 
 	}
 
@@ -106,6 +129,14 @@ export default class App extends React.Component {
 			 onChangeText={(value) => this.onChangeLName(value)}
 
 		/>
+		// Date of Birth
+		<TextInput
+			 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
+			 placeHolder = "Enter Text"
+			 value = { this.state.dob }
+			 onChangeText={(value) => this.onChangeDOB(value)}
+
+		/>
 		// Address: House Number, Street
 		<TextInput
 			 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
@@ -114,12 +145,20 @@ export default class App extends React.Component {
 			 onChangeText={(value) => this.onChangeStreet(value)}
 
 		/>
-		// Town, State
+		// Town
 		<TextInput
 			 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
 			 placeHolder = "Enter Text"
-			 value = { this.state.sttwn }
-			 onChangeText={(value) => this.onChangeStTwn(value)}
+			 value = { this.state.town }
+			 onChangeText={(value) => this.onChangeTown(value)}
+
+		/>
+		// State
+		<TextInput
+			 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
+			 placeHolder = "Enter Text"
+			 value = { this.state.st8 }
+			 onChangeText={(value) => this.onChangeSt8(value)}
 
 		/>
 		// Gender
@@ -131,8 +170,7 @@ export default class App extends React.Component {
 
 		/>
 		//Button to submit data to JSON file
-		<Button
-			onPress={this.onPressEnterData()}
+		<Button onPress ={this.onPressEnterData.bind(this)}
 			title="Submit"
 			color='purple'
 		/>
