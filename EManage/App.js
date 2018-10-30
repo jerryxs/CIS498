@@ -34,6 +34,10 @@ export default class App extends Component<Props> {
         };
     }
 
+    onPressEnterData(){
+      alert(this.state.licNum)
+    }
+
 
 
     render() {
@@ -111,10 +115,10 @@ export default class App extends Component<Props> {
                 placeholder = "Gender"
                 />
 
-                <Button
-                onPress={onPressLearnMore}
-                title="Learn More"
-                />
+                <Button onPress ={this.onPressEnterData.bind(this)}
+            			title="Submit"
+            			color='purple'
+            		/>
 
                 <View style={{flex: 2, backgroundColor: 'skyblue'}} />
 
