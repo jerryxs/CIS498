@@ -45,7 +45,7 @@ export default class App extends Component<Props> {
                 <View style={{flex: 1}}>
                 <View style={{flex: 1, backgroundColor: 'powderblue'}} />
                 <Text style={styles.welcome}>EManage</Text>
-                <Text style={styles.instructions}>I cant get anything else to work</Text>
+                <Text style={styles.instructions}>Please Enter the Following Data</Text>
 
 
 
@@ -56,7 +56,7 @@ export default class App extends Component<Props> {
                 style={{height: 40, borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
                 onChangeText={(licNum) => this.setState({licNum})}
                 value={this.state.licNum}
-                placeholder = "Enter License Number"
+                placeholder = "License Number"
                 />
 
                 <TextInput
@@ -64,7 +64,7 @@ export default class App extends Component<Props> {
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
-                placeholder = "Enter DOB"
+                placeholder = "Date of Birth"
                 />
 
                 <TextInput
