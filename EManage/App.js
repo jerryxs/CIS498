@@ -1,3 +1,4 @@
+
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -129,7 +130,7 @@ export default class App extends Component<Props> {
                 </View>
                 );
     }
-}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -157,5 +158,7 @@ const styles = StyleSheet.create({
 
 });
 
+
 //needed since we are not using create-react-native-app
 AppRegistry.registerComponent('Test', () => UselessTextInput);
+
