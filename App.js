@@ -20,20 +20,20 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
-    
+
     constructor(props) {
         super(props);
         this.state = { licNum: "",
         dob: ""
         };
     }
-    
+
     render() {
         return (
                 <View style={{flex: 1}}>
                 <View style={{flex: 1, backgroundColor: 'powderblue'}} />
                 <View style={{flex: 2, backgroundColor: 'skyblue'}} />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, width: 375, borderColor: 'gray', borderWidth: 2}}
@@ -41,7 +41,7 @@ export default class App extends Component<Props> {
                 value={this.state.licNum}
                 placeholder = "Enter License Number"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, width: 375, borderColor: 'gray', borderWidth: 2}}
@@ -49,11 +49,11 @@ export default class App extends Component<Props> {
                 value={this.state.dob}
                 placeholder = "Enter DOB"
                 />
-            
-                
+
+
                 <Text style={styles.welcome}>EManage</Text>
                 <Text style={styles.instructions}>I cant get anything else to work</Text>
-                
+
                 <View style={{flex: 3, backgroundColor: 'steelblue'}} />
                 </View>
                 );
