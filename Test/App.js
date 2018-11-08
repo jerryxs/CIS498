@@ -194,6 +194,20 @@ class cameraScreen extends React.Component {
                <Text style={{fontSize: 14}}> SNAP </Text>
                </TouchableOpacity>
                </View>
+               
+               <Button
+               title="Return"
+               onPress = {() => {
+               this.props.navigation.dispatch(StackActions.reset({
+                     index: 0,
+                     actions: [
+                               NavigationActions.navigate({ routeName: 'UserInput'})
+                               ],
+                     }))
+               }}
+               color='steelblue'
+               />
+               
                </View>
                );
     }
