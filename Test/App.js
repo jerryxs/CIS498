@@ -7,80 +7,23 @@
  * @flow
  */
 
-import React, { Component, Document, } from 'react';
-import { AppRegistry, Button, TextInput, Platform, StyleSheet, Text, View, } from 'react-native';
+import React, {
+                Component,
+                Document,
+} from 'react';
+
+import {
+    AppRegistry,
+    Button,
+    TextInput,
+    Platform,
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+} from 'react-native';
+
 import { RNCamera } from 'react-native-camera';
-
-var stockData = [
-                 {
-                 Symbol: "AAPL",
-                 Company: "Apple Inc.",
-                 Price: 132.54
-                 },
-                 {
-                 Symbol: "INTC",
-                 Company: "Intel Corporation",
-                 Price: 33.45
-                 },
-                 {
-                 Symbol: "GOOG",
-                 Company: "Google Inc",
-                 Price: 554.52
-                 },
-                 ];
-
-function convertArrayOfObjectsToCSV(args) {
-    var result, ctr, keys, columnDelimiter, lineDelimiter, data;
-    
-    data = args.data || null;
-    if (data == null || !data.length) {
-        return null;
-    }
-    
-    columnDelimiter = args.columnDelimiter || ',';
-    lineDelimiter = args.lineDelimiter || '\n';
-    
-    keys = Object.keys(data[0]);
-    
-    result = '';
-    result += keys.join(columnDelimiter);
-    result += lineDelimiter;
-    
-    data.forEach(function(item) {
-                 ctr = 0;
-                 keys.forEach(function(key) {
-                              if (ctr > 0) result += columnDelimiter;
-                              
-                              result += item[key];
-                              ctr++;
-                              });
-                 result += lineDelimiter;
-                 });
-    
-    return result;
-}
-
-function downloadCSV(args) {
-    var data, filename, link;
-    var csv = convertArrayOfObjectsToCSV({
-                                         data: stockData
-                                         });
-    console.warn(stockData);
-    
-    if (csv == null) return;
-    
-    filename = args.filename || 'export.csv';
-    
-    if (!csv.match(/^data:text\/csv/i)) {
-        csv = 'data:text/csv;charset=utf-8,' + csv;
-    }
-    data = encodeURI(csv);
-    
-    /*link = document.createElement('a');
-    link.setAttribute('href', data);
-    link.setAttribute('download', filename);
-    link.click();*/
-}
 
 const instructions = Platform.select({
                                      /*ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -128,7 +71,6 @@ export default class App extends Component<Props> {
         
         // just makes a warning pop up with the data entered in the text boxes
         console.warn(csvData);
-        downloadCSV(csvData);
         /*
         var csvRow = [];
         var A = [['LicenseNum' , 'DateOfBirth', 'FirstName', 'LastName', 'Address', 'Town', 'State', 'Gender']];
@@ -159,121 +101,142 @@ export default class App extends Component<Props> {
     
     render() {
         return (
-                <View style={{flex: 1}}>
-                <View style={{flex: 1, backgroundColor: 'powderblue'}} />
-                <Text style={styles.welcome}>EManage</Text>
-                <Text style={styles.instructions}>Please Enter the Following Data</Text>
+            <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: 'powderblue'}} />
+            <Text style={styles.welcome}>EManage</Text>
+            <Text style={styles.instructions}>Please Enter the Following Data</Text>
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
                 onChangeText={(licNum) => this.setState({licNum})}
                 value={this.state.licNum}
                 placeholder = "License Number"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
                 placeholder = "Date of Birth"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(fName) => this.setState({fName})}
                 value={this.state.fName}
                 placeholder = "First Name"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(lName) => this.setState({lName})}
                 value={this.state.lName}
                 placeholder = "Last Name"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(address) => this.setState({address})}
                 value={this.state.address}
                 placeholder = "Address"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(town) => this.setState({town})}
                 value={this.state.town}
                 placeholder = "Town"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(st8) => this.setState({st8})}
                 value={this.state.st8}
                 placeholder = "State"
-                />
+            />
                 
-                <TextInput
+            <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(gndr) => this.setState({gndr})}
                 value={this.state.gndr}
                 placeholder = "Gender"
-                />
+            />
                 
-                <Button onPress ={this.onPressEnterData.bind(this)}
+            <Button onPress ={this.onPressEnterData.bind(this)}
                 title="Submit"
                 color='purple'
-                />
+            />
                 
-                <Button onPress ={this.onPressEnterData.bind(this)}
+            <Button onPress ={this.onPressEnterData.bind(this)}
                 title="Open Camera"
                 color='steelblue'
-                />
+            />
                 
                 <View style={{flex: 2, backgroundColor: 'skyblue'}} />
-                
                 <View style={{flex: 3, backgroundColor: 'steelblue'}} />
                 
-                </View>
                 
+            <RNCamera
+                ref={ref => {
+                this.camera = ref;
+                }}
+                style = {styles.preview}
+                type={RNCamera.Constants.Type.back}
+                flashMode={RNCamera.Constants.FlashMode.on}
+                permissionDialogTitle={'Permission to use camera'}
+                permissionDialogMessage={'We need your permission to use your camera phone'}
+                onGoogleVisionBarcodesDetected={({ barcodes }) => {
+                console.log(barcodes)
+                }}
+            />
                 
-                );
-        }
+            <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
+            <TouchableOpacity
+                onPress={this.takePicture.bind(this)}
+                style = {styles.capture}
+            >
+                <Text style={{fontSize: 14}}> SNAP </Text>
+            </TouchableOpacity>
+            </View>
+                
+            </View>
+                
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-                 container: {
-                 flex: 1,
-                 justifyContent: 'center',
-                 alignItems: 'center',
-                 backgroundColor: '#F5FCFF',
-                 },
-                 welcome: {
-                 fontSize: 20,
-                 textAlign: 'center',
-                 margin: 10,
-                 },
-                 instructions: {
-                 textAlign: 'center',
-                 color: '#333333',
-                 marginBottom: 5,
-                 },
-                 license: {
-                 height: 40,
-                 width: 100,
-                 borderColor: 'gray',
-                 borderWidth: 2
-                 },
-                 
-                 });
+    container: {
+     flex: 1,
+     justifyContent: 'center',
+     alignItems: 'center',
+     backgroundColor: '#F5FCFF',
+    },
+    welcome: {
+     fontSize: 20,
+     textAlign: 'center',
+     margin: 10,
+    },
+    instructions: {
+     textAlign: 'center',
+     color: '#333333',
+     marginBottom: 5,
+    },
+    license: {
+     height: 40,
+     width: 100,
+     borderColor: 'gray',
+     borderWidth: 2
+    }
+});
 
 //needed since we are not using create-react-native-app
 AppRegistry.registerComponent('Test', () => UselessTextInput);
