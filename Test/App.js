@@ -186,7 +186,7 @@ export default class App extends Component<Props> {
                 
             <RNCamera
                 ref={ref => {
-                this.camera = ref;
+                    this.camera = ref;
                 }}
                 style = {styles.preview}
                 type={RNCamera.Constants.Type.back}
@@ -194,7 +194,7 @@ export default class App extends Component<Props> {
                 permissionDialogTitle={'Permission to use camera'}
                 permissionDialogMessage={'We need your permission to use your camera phone'}
                 onGoogleVisionBarcodesDetected={({ barcodes }) => {
-                console.log(barcodes)
+                    console.log(barcodes)
                 }}
             />
                 
@@ -210,6 +210,12 @@ export default class App extends Component<Props> {
             </View>
                 
         );
+    }
+    takePicture = async function(camera) {
+        const options = { quality: 0.5, base64: true };
+        const data = await camera.takePictureAsync(options);
+        //  eslint-disable-next-line
+        console.log(data.uri);
     }
 }
 
@@ -235,6 +241,20 @@ const styles = StyleSheet.create({
      width: 100,
      borderColor: 'gray',
      borderWidth: 2
+    },
+    preview: {
+     flex: 1,
+     justifyContent: 'flex-end',
+     alignItems: 'center',
+    },
+    capture: {
+     flex: 0,
+     backgroundColor: '#fff',
+     borderRadius: 5,
+     padding: 15,
+     paddingHorizontal: 20,
+     alignSelf: 'center',
+     margin: 20,
     }
 });
 
