@@ -170,7 +170,7 @@ class cameraScreen extends React.Component {
     render() {
         return(
                
-               <View style={{flex: 2, backgroundColor: 'skyblue'}} >
+               < View style={{flex: 2, backgroundColor: 'skyblue'}} >
                
                <RNCamera
                ref={ref => {
@@ -234,43 +234,43 @@ export default createStackNavigator({
     });
 
 const styles = StyleSheet.create({
-                                 container: {
-                                 flex: 1,
-                                 justifyContent: 'center',
-                                 alignItems: 'center',
-                                 backgroundColor: '#F5FCFF',
-                                 },
-                                 welcome: {
-                                 fontSize: 20,
-                                 textAlign: 'center',
-                                 margin: 10,
-                                 },
-                                 instructions: {
-                                 textAlign: 'center',
-                                 color: '#333333',
-                                 marginBottom: 5,
-                                 },
-                                 license: {
-                                 height: 40,
-                                 width: 100,
-                                 borderColor: 'gray',
-                                 borderWidth: 2
-                                 },
-                                 preview: {
-                                 flex: 1,
-                                 justifyContent: 'flex-end',
-                                 alignItems: 'center',
-                                 },
-                                 capture: {
-                                 flex: 0,
-                                 backgroundColor: '#fff',
-                                 borderRadius: 5,
-                                 padding: 15,
-                                 paddingHorizontal: 20,
-                                 alignSelf: 'center',
-                                 margin: 20,
-                                 }
-                                 });
+        container: {
+         flex: 1,
+         justifyContent: 'center',
+         alignItems: 'center',
+         backgroundColor: '#F5FCFF',
+        },
+        welcome: {
+         fontSize: 20,
+         textAlign: 'center',
+         margin: 10,
+        },
+        instructions: {
+         textAlign: 'center',
+         color: '#333333',
+         marginBottom: 5,
+        },
+        license: {
+         height: 40,
+         width: 100,
+         borderColor: 'gray',
+         borderWidth: 2
+        },
+        preview: {
+         flex: 1,
+         justifyContent: 'flex-end',
+         alignItems: 'center',
+        },
+        capture: {
+         flex: 0,
+         backgroundColor: '#fff',
+         borderRadius: 5,
+         padding: 15,
+         paddingHorizontal: 20,
+         alignSelf: 'center',
+         margin: 20,
+        }
+    });
 
 //needed since we are not using create-react-native-app
 AppRegistry.registerComponent('Test', () => UselessTextInput);
