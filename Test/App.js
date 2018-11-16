@@ -6,74 +6,117 @@
  * @flow
  */
 
-import React, {
-    Component,
-    Document,
-} from 'react';
-
+import React, {Component} from 'react';
 import {
-    AppRegistry,
-    Button,
-    TextInput,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-} from 'react-native';
-
-import { RNCamera } from 'react-native-camera';
-
+	AppRegistry,
+	Button,
+	TextInput,
+	Platform,
+	StyleSheet,
+	Text,
+	View
+	} from 'react-native';
 import {
-    createStackNavigator,
-    StackActions,
-    NavigationActions
+	createStackNavigator,
+	stackActions,
+	NavigationActions,
 } from 'react-navigation';
+import nodejs from 'nodejs-mobile-react-native';
+//import { Zyre } from "zyre";
+
+//const Zyre = require('zyre.js');
+
+//New zyre object
+/*const zyre = new Zyre({
+  name: 'foo',      // Name of the zyre node
+  iface: 'eth0',    // Network interface
+  headers: {        // Headers will be sent on every new connection
+    foo: 'bar',
+  },
+  evasive: 5000,    // Timeout after which the local node will try to ping a not responding peer
+  expired: 30000,   // Timeout after which a not responding peer gets disconnected
+  port: 49152,      // Port for incoming messages, will be incremented if already in use
+  bport: 5670,      // Discovery beacon broadcast port
+  binterval: 1000,  // Discovery beacon broadcast interval
+});*/
+
+const instructions = Platform.select({
+
+  /*ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+	android:
+    'Double tap R on your keyboard to reload,\n' +
+    'Shake or press menu button for dev menu',*/
+
+});
+
+ 
 
 type Props = {};
-class App extends Component<Props> {
-    
+export default class App extends Component<Props> {	
+
     constructor(props) {
         super(props);
         this.state = {
-        licNum: "",
-        dob: "",
-        fName: "",
-        lName: "",
-        address: "",
-        town: "",
-        st8: "",
-        gndr: ""
+			licNum: "",
+			dob: "",
+			fName: "",
+			lName: "",
+			address: "",
+			town: "",
+			st8: "",
+			gndr: ""
         };
     }
+	
+	
 
     onPressEnterData(){
-        // Idea: when the submit button is pressed... then make the array
-        // for the csv + continue tutorial functions...
-        var csvData = [{
-                       // May not need to add the strings each time.
-                       // Probably makes more sense to append to the first row of the csv file the lables
-                       'LicenseNum' : this.state.licNum,
-                       'DateOfBirth' : this.state.dob,
-                       'FirstName' : this.state.fName,
-                       'LastName' : this.state.lName,
-                       'Address' : this.state.address,
-                       'Town' : this.state.town,
-                       'State' : this.state.st8,
-                       'Gender' : this.state.gndr
-                       }];
-        
-        // just makes a warning pop up with the data entered in the text boxes
-        console.warn(csvData);
+	  // Idea: when the submit button is pressed... then make the array
+	  // for the csv + continue tutorial functions...
+	  var csvData = [
+	  {
+		// May not need to add the strings each time.
+		// Probably makes more sense to append to the first row of the csv file the lables
+		'LicenseNum' : this.state.licNum,
+		'DateOfBirth' : this.state.dob,
+		'FirstName' : this.state.fName,
+		'LastName' : this.state.lName,
+		'Address' : this.state.address,
+		'Town' : this.state.town,
+		'State' : this.state.st8,
+		'Gender' : this.state.gndr
+	  }
+
+	  ];
+	  // just makes a warning pop up with the data entered in the text boxes
+	  console.warn(csvData);
+
     }
-    
+	componentWillMount()
+  {
+    nodejs.start('main.js');
+    nodejs.channel.addListener(
+      'message',
+      (msg) => {
+        alert('From node: ' + msg);
+      },
+      this 
+    );
+  }
+
+
+
     render() {
         return (
                 <View style={{flex: 1}}>
                 <View style={{flex: 1, backgroundColor: 'powderblue'}} />
                 <Text style={styles.welcome}>EManage</Text>
                 <Text style={styles.instructions}>Please Enter the Following Data</Text>
-                
+
+
+
+
+				
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
@@ -81,7 +124,7 @@ class App extends Component<Props> {
                 value={this.state.licNum}
                 placeholder = "License Number"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -89,7 +132,7 @@ class App extends Component<Props> {
                 value={this.state.dob}
                 placeholder = "Date of Birth"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -97,7 +140,7 @@ class App extends Component<Props> {
                 value={this.state.fName}
                 placeholder = "First Name"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -105,7 +148,7 @@ class App extends Component<Props> {
                 value={this.state.lName}
                 placeholder = "Last Name"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -113,7 +156,7 @@ class App extends Component<Props> {
                 value={this.state.address}
                 placeholder = "Address"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -121,7 +164,7 @@ class App extends Component<Props> {
                 value={this.state.town}
                 placeholder = "Town"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -129,7 +172,7 @@ class App extends Component<Props> {
                 value={this.state.st8}
                 placeholder = "State"
                 />
-                
+
                 <TextInput
                 style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
@@ -137,140 +180,51 @@ class App extends Component<Props> {
                 value={this.state.gndr}
                 placeholder = "Gender"
                 />
-                
+
                 <Button onPress ={this.onPressEnterData.bind(this)}
-                title="Submit"
-                color='purple'
-                />
-                
-                <Button
-                title="Open Camera"
-                onPress = {() => {
-                this.props.navigation.dispatch(StackActions.reset({
-                      index: 0,
-                      actions: [
-                                NavigationActions.navigate({ routeName: 'Camera'})
-                                ],
-                            }))
-                }}
-                color='steelblue'
-                />
-                
+            			title="Submit"
+            			color='purple'
+            		/>
+				<Button title="Message Node"
+					onPress={() => nodejs.channel.send('A message!')}
+				/>
+
                 <View style={{flex: 2, backgroundColor: 'skyblue'}} />
+
                 <View style={{flex: 3, backgroundColor: 'steelblue'}} />
 
+
+
                 </View>
-                
                 );
     }
-    
 }
-
-class cameraScreen extends React.Component {
-    render() {
-        return(
-               
-               <View style={{flex: 2, backgroundColor: 'skyblue'}} >
-               
-               <RNCamera
-               ref={ref => {
-               this.camera = ref;
-               }}
-               style = {styles.preview}
-               type={RNCamera.Constants.Type.back}
-               flashMode={RNCamera.Constants.FlashMode.on}
-               permissionDialogTitle={'Permission to use camera'}
-               permissionDialogMessage={'We need your permission to use your camera phone'}
-               onGoogleVisionBarcodesDetected={({ barcodes }) => {
-               console.log(barcodes)
-               }}
-               />
-               
-               <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
-               <TouchableOpacity
-               onPress={this.takePicture.bind(this)}
-               style = {styles.capture}
-               >
-               <Text style={{fontSize: 14}}> SNAP </Text>
-               </TouchableOpacity>
-               </View>
-               
-               <Button
-               title="Return"
-               onPress = {() => {
-               this.props.navigation.dispatch(StackActions.reset({
-                     index: 0,
-                     actions: [
-                               NavigationActions.navigate({ routeName: 'UserInput'})
-                               ],
-                     }))
-               }}
-               color='steelblue'
-               />
-               
-               </View>
-               );
-    }
-    takePicture = async function(camera) {
-        try{
-        const options = { quality: 0.5, base64: true };
-        const data = await camera.takePictureAsync(options);
-        //  eslint-disable-next-line
-        console.log(data.uri);
-        } catch(e) {
-            console.log(e)
-        }
-    }
-}
-
-export default createStackNavigator({
-            Camera: {
-            screen: cameraScreen,
-            },
-            UserInput: {
-            screen: App,
-            },
-        }, { initialRouteName: 'UserInput',
-    });
 
 const styles = StyleSheet.create({
-                                 container: {
-                                 flex: 1,
-                                 justifyContent: 'center',
-                                 alignItems: 'center',
-                                 backgroundColor: '#F5FCFF',
-                                 },
-                                 welcome: {
-                                 fontSize: 20,
-                                 textAlign: 'center',
-                                 margin: 10,
-                                 },
-                                 instructions: {
-                                 textAlign: 'center',
-                                 color: '#333333',
-                                 marginBottom: 5,
-                                 },
-                                 license: {
-                                 height: 40,
-                                 width: 100,
-                                 borderColor: 'gray',
-                                 borderWidth: 2
-                                 },
-                                 preview: {
-                                 flex: 1,
-                                 justifyContent: 'flex-end',
-                                 alignItems: 'center',
-                                 },
-                                 capture: {
-                                 flex: 0,
-                                 backgroundColor: '#fff',
-                                 borderRadius: 5,
-                                 padding: 15,
-                                 paddingHorizontal: 20,
-                                 alignSelf: 'center',
-                                 margin: 20,
-                                 }
-                                 });
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+  license: {
+    height: 40,
+    width: 100,
+    borderColor: 'gray',
+    borderWidth: 2
+ },
+
+});
 
 //needed since we are not using create-react-native-app
 AppRegistry.registerComponent('Test', () => UselessTextInput);

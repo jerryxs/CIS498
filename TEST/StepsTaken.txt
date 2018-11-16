@@ -1,0 +1,7 @@
+1: react-native init // creates react native project template
+2: editied the App.js to be able to have TextInput and added some color and other attributes // working
+3: npm install nodejs-mobile-react-native
+4: react-native link nodejs-mobile-react-native
+5: went into the nodejs-project folder and did npm install
+6: Downloaded android NDK // it installed itself and was initalized when the react-native run-android command was entered
+7: added rn-cli.config.js // makes sure we dont get dupilicate naming issues 
