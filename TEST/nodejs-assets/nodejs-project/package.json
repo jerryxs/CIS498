@@ -8,5 +8,8 @@
   "description": "node part of the project",
   "main": "main.js",
   "author": "janeasystems",
-  "license": ""
+  "license": "",
+  "dependencies": {
+    "fast-csv": "^2.4.1"
+  }
 }

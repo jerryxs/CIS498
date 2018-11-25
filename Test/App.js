@@ -22,6 +22,7 @@ import {
 	NavigationActions,
 } from 'react-navigation';
 import nodejs from 'nodejs-mobile-react-native';
+import FileSystem from 'react-native-filesystem';
 //import { Zyre } from "zyre";
 
 //const Zyre = require('zyre.js');
@@ -71,23 +72,20 @@ export default class App extends Component<Props> {
 	
 
     onPressEnterData(){
-	  // Idea: when the submit button is pressed... then make the array
-	  // for the csv + continue tutorial functions...
+	  
 	  var csvData = [
-	  {
-		// May not need to add the strings each time.
-		// Probably makes more sense to append to the first row of the csv file the lables
-		'LicenseNum' : this.state.licNum,
-		'DateOfBirth' : this.state.dob,
-		'FirstName' : this.state.fName,
-		'LastName' : this.state.lName,
-		'Address' : this.state.address,
-		'Town' : this.state.town,
-		'State' : this.state.st8,
-		'Gender' : this.state.gndr
-	  }
+	  
+		 this.state.licNum,
+		 this.state.dob,
+		 this.state.fName,
+		 this.state.lName,
+		 this.state.address,
+		 this.state.town,
+		 this.state.st8,
+		 this.state.gndr
 
 	  ];
+	  nodejs.channel.send(csvData)
 	  // just makes a warning pop up with the data entered in the text boxes
 	  console.warn(csvData);
 
@@ -100,7 +98,15 @@ export default class App extends Component<Props> {
       (msg) => {
         alert('From node: ' + msg);
       },
-      this 
+      this
+    );
+		nodejs.start('licData.js');
+    nodejs.channel.addListener(
+      'message',
+      (msg2) => {
+        alert('From node: ' + msg2);
+      },
+      this
     );
   }
 
