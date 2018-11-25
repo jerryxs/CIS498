@@ -5,3 +5,5 @@
 5: went into the nodejs-project folder and did npm install
 6: Downloaded android NDK // it installed itself and was initalized when the react-native run-android command was entered
 7: added rn-cli.config.js // makes sure we dont get dupilicate naming issues 
+8: npm install rn-fetch-blob
+9: react-native link rn-fetch-blob

@@ -22,7 +22,10 @@ import {
 	NavigationActions,
 } from 'react-navigation';
 import nodejs from 'nodejs-mobile-react-native';
-import FileSystem from 'react-native-filesystem';
+import RNFetchBlob from 'rn-fetch-blob';
+
+
+
 //import { Zyre } from "zyre";
 
 //const Zyre = require('zyre.js');
@@ -50,7 +53,11 @@ const instructions = Platform.select({
 
 });
 
- 
+ RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64')
+    .then((stream) => {
+        stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender'))
+        return stream.close()
+    })
 
 type Props = {};
 export default class App extends Component<Props> {	
