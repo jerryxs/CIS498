@@ -52,16 +52,28 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',*/
 
 });
-
- RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
-    .then((stream) => {
-        stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
-        return stream.close()
-    })
-
+if(Platform.OS === 'android')
+{
+	/*
+	 * Check to see if the CSV file exists
+	 * If it does then skip this portion as to not add the headers again
+	 * If not then create this file at the file path for android and add headers
+	 */
+	 RNFetchBlob.fs.exists('/data/user/0/com.test/files/my.csv')
+.then((exist) => {
+    if(exist === false){
+			RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
+		     .then((stream) => {
+		         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
+		         return stream.close()
+		     })
+		}
+})
+}
 type Props = {};
 export default class App extends Component<Props> {	
 
+	//Add states for input boxes
     constructor(props) {
         super(props);
         this.state = {
@@ -78,8 +90,9 @@ export default class App extends Component<Props> {
 	
 	
 
+	//Function for submit button
     onPressEnterData(){
-	  
+	  //When submit is pressed, an array is populated with the new state of each input box
 	  var csvData = [
 	  
 		 this.state.licNum,
@@ -92,16 +105,20 @@ export default class App extends Component<Props> {
 		 this.state.gndr
 
 	  ];
-	  //nodejs.channel.send(csvData)
-	  RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
-    .then((stream) => {
-        stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
-        return stream.close()
-    })
+	  if(Platform.OS === 'android')
+	  {
+		  //Append the input data to the file
+		  RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
+		.then((stream) => {
+			stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
+			return stream.close()
+		})
+	  }
 	  // just makes a warning pop up with the data entered in the text boxes
 	  console.warn(csvData);
 
     }
+	//Backend for zyre
 	componentWillMount()
   {
     nodejs.start('main.js');
@@ -109,14 +126,6 @@ export default class App extends Component<Props> {
       'message',
       (msg) => {
         alert('From node: ' + msg);
-      },
-      this
-    );
-		nodejs.start('licData.js');
-    nodejs.channel.addListener(
-      'message',
-      (msg2) => {
-        alert('From node: ' + msg2);
       },
       this
     );
