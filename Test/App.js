@@ -53,7 +53,7 @@ const instructions = Platform.select({
 
 });
 
- RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64')
+ RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
     .then((stream) => {
         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender'))
         return stream.close()
@@ -92,7 +92,12 @@ export default class App extends Component<Props> {
 		 this.state.gndr
 
 	  ];
-	  nodejs.channel.send(csvData)
+	  //nodejs.channel.send(csvData)
+	  RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
+    .then((stream) => {
+        stream.write(RNFetchBlob.base64.encode(csvData))
+        return stream.close()
+    })
 	  // just makes a warning pop up with the data entered in the text boxes
 	  console.warn(csvData);
 
