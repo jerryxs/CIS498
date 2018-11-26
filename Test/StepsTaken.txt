@@ -7,3 +7,4 @@
 7: added rn-cli.config.js // makes sure we dont get dupilicate naming issues 
 8: npm install rn-fetch-blob
 9: react-native link rn-fetch-blob
+10: Import RNFetchblob from 'rn-fetch-blob'; // App.js

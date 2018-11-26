@@ -52,24 +52,25 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',*/
 
 });
-if(Platform.OS === 'android')
-{
+
+const dirs = RNFetchBlob.fs.dirs
+var path = dirs.DocumentDir + '/my.csv';
 	/*
 	 * Check to see if the CSV file exists
 	 * If it does then skip this portion as to not add the headers again
 	 * If not then create this file at the file path for android and add headers
 	 */
-	 RNFetchBlob.fs.exists('/data/user/0/com.test/files/my.csv')
+	 RNFetchBlob.fs.exists(path)
 .then((exist) => {
     if(exist === false){
-			RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
+			RNFetchBlob.fs.writeStream(path, 'base64', true)
 		     .then((stream) => {
 		         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
 		         return stream.close()
 		     })
 		}
 })
-}
+
 type Props = {};
 export default class App extends Component<Props> {	
 
@@ -105,15 +106,31 @@ export default class App extends Component<Props> {
 		 this.state.gndr
 
 	  ];
-	  if(Platform.OS === 'android')
-	  {
+	  
+	  console.warn("Directory: ", path);
+	  //Array is indexed properly can store csvData[0] into string to dup check
+	  //console.warn("Array[0]: ", csvData[0]);
+		  //Read file before adding new info to it
+		  //Currently just reads the file and spits out the info in a warn
+		  RNFetchBlob.fs.readStream(path, 'utf8')
+			.then((stream) => {
+				let data = ''
+				stream.open()
+				stream.onData((chunk) => {
+					data += chunk
+				})
+				stream.onEnd(() => {
+					console.warn(data)
+				})
+			})
+		  
 		  //Append the input data to the file
-		  RNFetchBlob.fs.writeStream('/data/user/0/com.test/files/my.csv', 'base64', true)
+		  RNFetchBlob.fs.writeStream(path, 'base64', true)
 		.then((stream) => {
 			stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
 			return stream.close()
 		})
-	  }
+	  
 	  // just makes a warning pop up with the data entered in the text boxes
 	  console.warn(csvData);
 
