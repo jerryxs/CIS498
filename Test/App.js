@@ -119,6 +119,9 @@ export default class App extends Component<Props> {
 				stream.onData((chunk) => {
 					data += chunk
 					
+				})
+				stream.onEnd(() => {
+					
 					if(data.includes(csvData[0]))
 					{
 						alert('Duplicate Warning!' + '\n' + 'Guest Already Entered The Event',) 
@@ -136,12 +139,7 @@ export default class App extends Component<Props> {
 						})
 						alert('Guest Added To The Event List!')
 					}
-					
 				})
-				/*stream.onEnd(() => {
-					
-					console.warn(data)
-				})*/
 			})
 			
 		  /*RNFetchBlob.fs.hash(path, 'sha256')
