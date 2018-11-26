@@ -118,18 +118,38 @@ export default class App extends Component<Props> {
 				stream.open()
 				stream.onData((chunk) => {
 					data += chunk
+					
+					if(data.includes(csvData[0]))
+					{
+						console.warn(csvData[0], " Is already in the file");
+					}
+					else
+					{
+						//Append the input data to the file
+						RNFetchBlob.fs.writeStream(path, 'base64', true)
+						.then((stream) => {
+							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
+							return stream.close()
+						})
+					}
+					
 				})
-				stream.onEnd(() => {
+				/*stream.onEnd(() => {
+					
 					console.warn(data)
-				})
+				})*/
 			})
+			
+		  /*RNFetchBlob.fs.hash(path, 'sha256')
+		  .then((hash) => {
+			 
+				
+			})*/
+			
+			 
+			
+			
 		  
-		  //Append the input data to the file
-		  RNFetchBlob.fs.writeStream(path, 'base64', true)
-		.then((stream) => {
-			stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
-			return stream.close()
-		})
 	  
 	  // just makes a warning pop up with the data entered in the text boxes
 	  console.warn(csvData);
