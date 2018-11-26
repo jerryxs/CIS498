@@ -107,7 +107,7 @@ export default class App extends Component<Props> {
 
 	  ];
 	  
-	  console.warn("Directory: ", path);
+	  //console.warn("Directory: ", path);
 	  //Array is indexed properly can store csvData[0] into string to dup check
 	  //console.warn("Array[0]: ", csvData[0]);
 		  //Read file before adding new info to it
@@ -121,16 +121,20 @@ export default class App extends Component<Props> {
 					
 					if(data.includes(csvData[0]))
 					{
-						console.warn(csvData[0], " Is already in the file");
+						alert('Duplicate Warning!' + '\n' + 'Guest Already Entered The Event',) 
+						
+						//console.warn(csvData[0], " Is already in the file");
 					}
 					else
 					{
+						
 						//Append the input data to the file
 						RNFetchBlob.fs.writeStream(path, 'base64', true)
 						.then((stream) => {
 							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
 							return stream.close()
 						})
+						alert('Guest Added To The Event List!')
 					}
 					
 				})
@@ -152,7 +156,7 @@ export default class App extends Component<Props> {
 		  
 	  
 	  // just makes a warning pop up with the data entered in the text boxes
-	  console.warn(csvData);
+	  //console.warn(csvData);
 
     }
 	//Backend for zyre
