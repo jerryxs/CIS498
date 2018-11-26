@@ -23,6 +23,10 @@ import {
 } from 'react-navigation';
 import nodejs from 'nodejs-mobile-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
+import { sha256 } from 'react-native-sha256';
+
+
+
 
 
 
@@ -106,6 +110,15 @@ export default class App extends Component<Props> {
 		 this.state.gndr
 
 	  ];
+	  
+	  sha256(csvData[0]).then( hash => {
+		  csvData[0] = hash
+		  console.warn(csvData[0]);
+		})
+		sha256(csvData[4]).then( hash => {
+		  csvData[4] = hash
+		  console.warn(csvData[4]);
+		})
 	  
 	  //console.warn("Directory: ", path);
 	  //Array is indexed properly can store csvData[0] into string to dup check

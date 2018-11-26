@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sha256')
     compile project(':rn-fetch-blob')
     compile project(':nodejs-mobile-react-native')
     implementation fileTree(dir: "libs", include: ["*.jar"])

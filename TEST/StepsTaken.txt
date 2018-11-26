@@ -8,3 +8,5 @@
 8: npm install rn-fetch-blob
 9: react-native link rn-fetch-blob
 10: Import RNFetchblob from 'rn-fetch-blob'; // App.js
+11: npm install react-native-sha256
+12: react-native link react-native-sha256
