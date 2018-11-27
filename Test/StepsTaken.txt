@@ -10,3 +10,5 @@
 10: Import RNFetchblob from 'rn-fetch-blob'; // App.js
 11: npm install react-native-sha256
 12: react-native link react-native-sha256
+13: npm install react-native-wifi-p2p // android only set up details https://github.com/kirillzyusko/react-native-wifi-p2p
+

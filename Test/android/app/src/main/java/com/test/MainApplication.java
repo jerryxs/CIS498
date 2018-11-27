@@ -11,6 +11,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import io.wifi.p2p.WiFiP2PManagerPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new Sha256Package(),
             new RNFetchBlobPackage(),
-            new RNNodeJsMobilePackage()
+            new RNNodeJsMobilePackage(),
+			new WiFiP2PManagerPackage()
       );
     }
 

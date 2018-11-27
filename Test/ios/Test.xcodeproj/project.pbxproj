@@ -44,6 +44,7 @@
 		5F1F1039973240C498D77942 /* builtin_modules in Resources */ = {isa = PBXBuildFile; fileRef = C3D9E55087CE4148A24CE173 /* builtin_modules */; };
 		400AAD028D574FCFB49BF6B1 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CCB32CDFBC0342F791268965 /* libRNFetchBlob.a */; };
 		884F6B54E9EA4033B1A09288 /* libreact-native-sha256.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88F9860F6D044BDE8BC2357D /* libreact-native-sha256.a */; };
+		2635835EE40647049E98A817 /* libRCTMultipeerConnectivity.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AAD829A429C4862B596A560 /* libRCTMultipeerConnectivity.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -381,6 +382,8 @@
 		CCB32CDFBC0342F791268965 /* libRNFetchBlob.a */ = {isa = PBXFileReference; name = "libRNFetchBlob.a"; path = "libRNFetchBlob.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		4F25D97AD25E48AEAD4D73FA /* react-native-sha256.xcodeproj */ = {isa = PBXFileReference; name = "react-native-sha256.xcodeproj"; path = "../node_modules/react-native-sha256/ios/react-native-sha256.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		88F9860F6D044BDE8BC2357D /* libreact-native-sha256.a */ = {isa = PBXFileReference; name = "libreact-native-sha256.a"; path = "libreact-native-sha256.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		8A2E91219308433FB6996015 /* RCTMultipeerConnectivity.xcodeproj */ = {isa = PBXFileReference; name = "RCTMultipeerConnectivity.xcodeproj"; path = "../node_modules/react-native-multipeer/RCTMultipeerConnectivity.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		3AAD829A429C4862B596A560 /* libRCTMultipeerConnectivity.a */ = {isa = PBXFileReference; name = "libRCTMultipeerConnectivity.a"; path = "libRCTMultipeerConnectivity.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -412,6 +415,7 @@
 				D499F72454484254817A3ACA /* NodeMobile.framework in Frameworks */,
 				400AAD028D574FCFB49BF6B1 /* libRNFetchBlob.a in Frameworks */,
 				884F6B54E9EA4033B1A09288 /* libreact-native-sha256.a in Frameworks */,
+				2635835EE40647049E98A817 /* libRCTMultipeerConnectivity.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -621,6 +625,7 @@
 				6152850C52484E08B9D285B0 /* RNNodeJsMobile.xcodeproj */,
 				4D5F2477D74E49C6928D4809 /* RNFetchBlob.xcodeproj */,
 				4F25D97AD25E48AEAD4D73FA /* react-native-sha256.xcodeproj */,
+				8A2E91219308433FB6996015 /* RCTMultipeerConnectivity.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1454,12 +1459,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1491,12 +1498,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1529,6 +1538,7 @@ fi
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1559,6 +1569,7 @@ fi
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1596,12 +1607,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1640,12 +1653,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1683,12 +1698,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1726,12 +1743,14 @@ fi
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)\..\node_modules\nodejs-mobile-react-native\ios/**",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-sha256\ios",
+					"$(SRCROOT)\..\node_modules\react-native-multipeer",
 				);
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
