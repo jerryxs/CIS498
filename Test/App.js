@@ -25,26 +25,6 @@ import {
 import nodejs from 'nodejs-mobile-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
-import {
-  initialize,
-  isSuccessfulInitialize,
-  startDiscoveringPeers,
-  stopDiscoveringPeers,
-  unsubscribeFromPeersUpdates,
-  unsubscribeFromConnectionInfoUpdates,
-  subscribeOnConnectionInfoUpdates,
-  subscribeOnPeersUpdates,
-  connect,
-  disconnect,
-  createGroup,
-  removeGroup,
-  getAvailablePeers,
-  sendFile,
-  receiveFile,
-  getConnectionInfo
-} from 'react-native-wifi-p2p';
-
-
 
 
 const instructions = Platform.select({
@@ -74,15 +54,8 @@ var path = dirs.DocumentDir + '/my.csv';
 		}
 })
 
-
-
 type Props = {};
 export default class App extends Component<Props> {
-
-	//Android p2p
-
-
-
 
 	//Add states for input boxes
     constructor(props) {
@@ -95,39 +68,53 @@ export default class App extends Component<Props> {
 			address: "",
 			town: "",
 			st8: "",
-			gndr: "",
-			devices: []
+			gndr: ""
         };
     }
 
+		onPressTest(){
+			var num = 1;
+			var temp = 10000000;
+			var csvData = [];
+			for(num; num < 5000; num++){
 
-			androidPeers()
-			{
-				initialize();
-				isSuccessfulInitialize()
-					.then(status => console.warn(status));
-				startDiscoveringPeers()
-					.then(() => console.warn('Starting of discovering was successful'))
-					.catch(err => console.warn(err));
+				csvData = [
+				10000000,
+				"12/4/95",
+				"Nick",
+				"Corcoran",
+				"123 test st",
+				"testville",
+				"Testachusetts",
+				"t"
 
+			 ];
+			 csvData[0] = 10000000;
+			 csvData[0] = csvData[0] + num;
+			 csvData[0] = "S" + csvData[0];
 
+			 sha256(csvData[0]).then( hash => {
+			 csvData[0] = hash
+			 RNFetchBlob.fs.appendFile(path, RNFetchBlob.base64.encode(csvData + '\n'), 'base64')
+						 .then(()=>{ return;})
+			 })
+
+				csvData[0] = 10000000;
 			}
-onGetPeers()
-{
-	getAvailablePeers()
-	.then(({ devices }) => console.warn(devices))
-}
-
-onConnectToPeer()
-{
-	connect('12:e7:c6:9e:3d:e5')
-    .then(() => console.warn('Successfully connected'))
-    .catch(err => console.error('Something gone wrong. Details: ', err));
-
-		createGroup()
-    .then(() => console.warn('Group created successfully!'))
-    .catch(err => console.error('Something gone wrong. Details: ', err));
-}
+			console.warn("done");
+		}
+		getDate()
+		{
+			var today = new Date();
+    	var birthDate = new Date(this.state.dob);
+	    var age = today.getFullYear() - birthDate.getFullYear();
+	    var m = today.getMonth() - birthDate.getMonth();
+	    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+			{
+	        age--;
+	    }
+			console.warn(age);
+			}
 
 
 
@@ -146,6 +133,7 @@ onConnectToPeer()
 		 this.state.gndr
 
 	  ];
+
 		sha256(csvData[0]).then( hash => {
 			csvData[0] = hash
     //console.warn(csvData[0]);
@@ -171,7 +159,7 @@ onConnectToPeer()
 
 				stream.onEnd(() => {
 					if(data.includes(csvData[0])){
-						alert('Duplicate Warning!' +'\n' + 'Guest Is Already In The Event')
+						alert('Duplicate Warning!')
 						//console.warn(csvData[0], " Is already in the file");
 					}
 					else{
@@ -187,7 +175,7 @@ onConnectToPeer()
 
 				})
 			})
-			this.setState({licNum: "",
+		/*	this.setState({licNum: "",
 										dob: "",
 										fName: "",
 										lName: "",
@@ -195,16 +183,13 @@ onConnectToPeer()
 										town: "",
 										st8: "",
 										gndr: ""
-							        })
+							        })*/
 
 	  // just makes a warning pop up with the data entered in the text boxes
 	  //console.warn(csvData);
 
     }
-
-
-
-	//Backend
+	//Backend for zyre
 	/*componentWillMount()
   {
     nodejs.start('main.js');
@@ -247,7 +232,7 @@ onConnectToPeer()
                 style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
-                placeholder = "Date of Birth"
+                placeholder = "MM/DD/YY"
 								placeholderTextColor = "black"
                 />
 
@@ -304,32 +289,23 @@ onConnectToPeer()
                 placeholder = "Gender"
 								placeholderTextColor = "black"
                 />
-				<View style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}>
+								<View style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}>
                 <Button  onPress ={this.onPressEnterData.bind(this)}
             			title="Submit"
             			color='purple'
             		/>
-				 <Button  onPress ={this.androidPeers.bind(this)}
-            			title="Node"
+								<Button  onPress ={this.onPressTest.bind(this)}
+            			title="Test"
             			color='purple'
             		/>
-				<Button  onPress ={this.onGetPeers.bind(this)}
-           			title="Get Peers"
-           			color='purple'
-           		/>
-				<Button  onPress ={this.onConnectToPeer.bind(this)}
-           			title="Connect"
-           			color='purple'
-           		/>
-				</View>
+								<Button  onPress ={this.getDate.bind(this)}
+            			title="Get Date"
+            			color='purple'
+            		/>
+								</View>
 
 
-
-
-
-
-
-				</View>
+								</View>
                 </ScrollView>
                 );
     }
@@ -361,5 +337,6 @@ const styles = StyleSheet.create({
  },
 
 });
+
 //needed since we are not using create-react-native-app
 AppRegistry.registerComponent('Test', () => UselessTextInput);
