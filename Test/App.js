@@ -114,7 +114,7 @@ export default class App extends Component<Props> {
 	        age--;
 	    }
 			console.warn(age);
-			}
+		}
 
 
 
@@ -159,7 +159,7 @@ export default class App extends Component<Props> {
 
 				stream.onEnd(() => {
 					if(data.includes(csvData[0])){
-						alert('Duplicate Warning!')
+						alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
 						//console.warn(csvData[0], " Is already in the file");
 					}
 					else{
