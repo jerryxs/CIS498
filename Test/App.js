@@ -74,23 +74,15 @@ var path = dirs.DocumentDir + '/my.csv';
 		}
 })
 
+
+
 type Props = {};
 export default class App extends Component<Props> {
-	
+
 	//Android p2p
-	
-	androidPeers()
-	{
-		initialize();
-		isSuccessfulInitialize()
-			.then(status => console.warn(status));
-		startDiscoveringPeers()
-			.then(() => console.warn('Starting of discovering was successful'))
-			.catch(err => console.warn(err));
-			
-		getAvailablePeers()
-		.then(({ devices }) => console.warn(devices))
-	}
+
+
+
 
 	//Add states for input boxes
     constructor(props) {
@@ -103,9 +95,39 @@ export default class App extends Component<Props> {
 			address: "",
 			town: "",
 			st8: "",
-			gndr: ""
+			gndr: "",
+			devices: []
         };
     }
+
+
+			androidPeers()
+			{
+				initialize();
+				isSuccessfulInitialize()
+					.then(status => console.warn(status));
+				startDiscoveringPeers()
+					.then(() => console.warn('Starting of discovering was successful'))
+					.catch(err => console.warn(err));
+
+
+			}
+onGetPeers()
+{
+	getAvailablePeers()
+	.then(({ devices }) => console.warn(devices))
+}
+
+onConnectToPeer()
+{
+	connect('12:e7:c6:9e:3d:e5')
+    .then(() => console.warn('Successfully connected'))
+    .catch(err => console.error('Something gone wrong. Details: ', err));
+
+		createGroup()
+    .then(() => console.warn('Group created successfully!'))
+    .catch(err => console.error('Something gone wrong. Details: ', err));
+}
 
 
 
@@ -149,7 +171,7 @@ export default class App extends Component<Props> {
 
 				stream.onEnd(() => {
 					if(data.includes(csvData[0])){
-						alert('Duplicate Warning!')
+						alert('Duplicate Warning!' +'\n' + 'Guest Is Already In The Event')
 						//console.warn(csvData[0], " Is already in the file");
 					}
 					else{
@@ -179,9 +201,9 @@ export default class App extends Component<Props> {
 	  //console.warn(csvData);
 
     }
-	
-	
-	
+
+
+
 	//Backend
 	/*componentWillMount()
   {
@@ -291,6 +313,14 @@ export default class App extends Component<Props> {
             			title="Node"
             			color='purple'
             		/>
+				<Button  onPress ={this.onGetPeers.bind(this)}
+           			title="Get Peers"
+           			color='purple'
+           		/>
+				<Button  onPress ={this.onConnectToPeer.bind(this)}
+           			title="Connect"
+           			color='purple'
+           		/>
 				</View>
 
 
