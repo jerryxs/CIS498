@@ -16,7 +16,7 @@
     "react-native-fs": "^2.12.1",
     "react-native-sha256": "^1.1.1",
     "react-native-wifi-p2p": "^0.6.4",
-    "react-navigation": "^2.18.2",
+    "react-navigation": "^2.18.3",
     "rn-fetch-blob": "^0.10.13",
     "zyre.js": "^1.2.1"
   },

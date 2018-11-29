@@ -1,10 +1,18 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  View,
-  Button
-} from 'react-native';
+	AppRegistry,
+	Button,
+	TextInput,
+	Platform,
+	StyleSheet,
+	Text,
+	ScrollView,
+	View
+	} from 'react-native';
+import nodejs from 'nodejs-mobile-react-native';
+import RNFetchBlob from 'rn-fetch-blob';
+import { sha256 } from 'react-native-sha256';
+import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
 import {
   initialize,
   isSuccessfulInitialize,
@@ -27,8 +35,296 @@ import {
 } from 'react-native-wifi-p2p';
 import { PermissionsAndroid } from 'react-native';
 
+const dirs = RNFetchBlob.fs.dirs
+var path = dirs.DocumentDir + '/my.csv';
+	/*
+	 * Check to see if the CSV file exists
+	 * If it does then skip this portion as to not add the headers again
+	 * If not then create this file at the file path for android and add headers
+	 */
+	 RNFetchBlob.fs.exists(path)
+.then((exist) => {
+    if(exist === false){
+			RNFetchBlob.fs.writeStream(path, 'base64', true)
+		     .then((stream) => {
+		         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
+		         return stream.close()
+		     })
+		}
+})
+
 type Props = {};
-export default class App extends Component<Props> {
+class App extends Component<Props> {
+
+	//Add states for input boxes
+    constructor(props) {
+        super(props);
+        this.state = {
+			licNum: "",
+			dob: "",
+			fName: "",
+			lName: "",
+			address: "",
+			town: "",
+			st8: "",
+			gndr: ""
+        };
+    }
+
+		onPressTest(){
+			var num = 1;
+			var temp = 10000000;
+			var csvData = [];
+			for(num; num < 5000; num++){
+
+				csvData = [
+				10000000,
+				"12/4/95",
+				"Nick",
+				"Corcoran",
+				"123 test st",
+				"testville",
+				"Testachusetts",
+				"t"
+
+			 ];
+			 csvData[0] = 10000000;
+			 csvData[0] = csvData[0] + num;
+			 csvData[0] = "S" + csvData[0];
+
+			 sha256(csvData[0]).then( hash => {
+			 csvData[0] = hash
+			 RNFetchBlob.fs.appendFile(path, RNFetchBlob.base64.encode(csvData + '\n'), 'base64')
+						 .then(()=>{ return;})
+			 })
+
+				csvData[0] = 10000000;
+			}
+			console.warn("done");
+		}
+		getDate()
+		{
+			var today = new Date();
+    	var birthDate = new Date(this.state.dob);
+	    var age = today.getFullYear() - birthDate.getFullYear();
+	    var m = today.getMonth() - birthDate.getMonth();
+	    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+			{
+	        age--;
+	    }
+			console.warn(age);
+		}
+
+
+
+	//Function for submit button
+    onPressEnterData(){
+	  //When submit is pressed, an array is populated with the new state of each input box
+	  var csvData = [
+
+		 this.state.licNum,
+		 this.state.dob,
+		 this.state.fName,
+		 this.state.lName,
+		 this.state.address,
+		 this.state.town,
+		 this.state.st8,
+		 this.state.gndr
+
+	  ];
+
+		sha256(csvData[0]).then( hash => {
+			csvData[0] = hash
+    //console.warn(csvData[0]);
+		})
+		sha256(csvData[4]).then( hash => {
+			csvData[4] = hash
+    //console.warn(csvData[4]);
+		})
+
+	  //console.warn("Directory: ", dirs.DocumentDir);
+	  //Array is indexed properly can store csvData[0] into string to dup check
+	  //console.warn("Array[0]: ", csvData[0]);
+		  //Read file before adding new info to it
+		  //Currently just reads the file and spits out the info in a warn
+		  RNFetchBlob.fs.readStream(path, 'utf8')
+			.then((stream) => {
+				let data = ''
+				stream.open()
+				stream.onData((chunk) => {
+					data += chunk
+
+				})
+
+				stream.onEnd(() => {
+					if(data.includes(csvData[0])){
+						alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
+						//console.warn(csvData[0], " Is already in the file");
+					}
+					else{
+
+						//Append the input data to the file
+						RNFetchBlob.fs.writeStream(path, 'base64', true)
+						.then((stream) => {
+							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
+							return stream.close()
+						})
+						alert('Guest Added To The Event List!')
+					}
+
+				})
+			})
+		/*	this.setState({licNum: "",
+										dob: "",
+										fName: "",
+										lName: "",
+										address: "",
+										town: "",
+										st8: "",
+										gndr: ""
+							        })*/
+
+	  // just makes a warning pop up with the data entered in the text boxes
+	  //console.warn(csvData);
+
+    }
+	//Backend for zyre
+	/*componentWillMount()
+  {
+    nodejs.start('main.js');
+    nodejs.channel.addListener(
+      'message',
+      (msg) => {
+        alert('From node: ' + msg);
+      },
+      this
+    );
+  }*/
+
+
+
+    render() {
+        return (
+								<ScrollView style={{flex:1}}>
+                <View style={{flex: 1, justifyContent: 'center', margin: 10, alignItems: 'center'}}>
+                <View style={{flex: 1, backgroundColor: 'powderblue', margin: 10, justifyContent: 'center', alignItems: 'center'}} />
+								<View style={{flex: 1, backgroundColor: 'skyblue'}} />
+
+                <View style={{flex: 1, backgroundColor: 'steelblue'}} />
+                <Text style={styles.welcome}>EManage</Text>
+                <Text style={styles.instructions}>Please Enter the Following Data</Text>
+
+
+
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
+                onChangeText={(licNum) => this.setState({licNum})}
+                value={this.state.licNum}
+                placeholder = "License Number"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(dob) => this.setState({dob})}
+                value={this.state.dob}
+                placeholder = "MM/DD/YY"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(fName) => this.setState({fName})}
+                value={this.state.fName}
+                placeholder = "First Name"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(lName) => this.setState({lName})}
+                value={this.state.lName}
+                placeholder = "Last Name"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(address) => this.setState({address})}
+                value={this.state.address}
+                placeholder = "Address"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(town) => this.setState({town})}
+                value={this.state.town}
+                placeholder = "Town"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 50, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(st8) => this.setState({st8})}
+                value={this.state.st8}
+                placeholder = "State"
+								placeholderTextColor = "black"
+                />
+
+                <TextInput
+                style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
+                style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
+                onChangeText={(gndr) => this.setState({gndr})}
+                value={this.state.gndr}
+                placeholder = "Gender"
+								placeholderTextColor = "black"
+                />
+								<View style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}>
+                <Button  onPress ={this.onPressEnterData.bind(this)}
+            			title="Submit"
+            			color='purple'
+            		/>
+								<Button  onPress ={this.onPressTest.bind(this)}
+            			title="Test"
+            			color='purple'
+            		/>
+								<Button  onPress ={this.getDate.bind(this)}
+            			title="Get Date"
+            			color='purple'
+            		/>
+                <Button
+                       title="Nodes"
+                       onPress = {() => {
+                       this.props.navigation.dispatch(StackActions.reset({
+                             index: 0,
+                             actions: [
+                                       NavigationActions.navigate({ routeName: 'DistributedList'})
+                                       ],
+                             }))
+                       }}
+                       color='purple'
+                       />
+								</View>
+
+
+								</View>
+                </ScrollView>
+                );
+    }
+}
+
+
+type Props = {};
+class Dlist extends Component<Props> {
 	constructor(props){
 	super(props);
   this.state = {
@@ -164,10 +460,33 @@ export default class App extends Component<Props> {
           title="Receive message"
           onPress={this.onReceiveMessage}
         />
+
+        <Button
+               title="Return"
+               onPress = {() => {
+               this.props.navigation.dispatch(StackActions.reset({
+                     index: 0,
+                     actions: [
+                               NavigationActions.navigate({ routeName: 'UserInput'})
+                               ],
+                     }))
+               }}
+               color='steelblue'
+               />
       </View>
     );
   }
 }
+
+export default createStackNavigator({
+            DistributedList: {
+            screen: Dlist,
+            },
+            UserInput: {
+            screen: App,
+            },
+        }, { initialRouteName: 'UserInput',
+    });
 
 const styles = StyleSheet.create({
   container: {
