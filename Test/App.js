@@ -112,7 +112,10 @@ class App extends Component<Props> {
 			{
 	        age--;
 	    }
-			console.warn(age);
+			if(age >= 21)
+      {
+        alert("Guest Is 21+")
+      }
 		}
 
 
@@ -174,6 +177,8 @@ class App extends Component<Props> {
 
 				})
 			})
+      // Resets the input boxes to empty after the submission
+      // Taken out right now for test demonstration
 		/*	this.setState({licNum: "",
 										dob: "",
 										fName: "",
@@ -184,24 +189,7 @@ class App extends Component<Props> {
 										gndr: ""
 							        })*/
 
-	  // just makes a warning pop up with the data entered in the text boxes
-	  //console.warn(csvData);
-
     }
-	//Backend for zyre
-	/*componentWillMount()
-  {
-    nodejs.start('main.js');
-    nodejs.channel.addListener(
-      'message',
-      (msg) => {
-        alert('From node: ' + msg);
-      },
-      this
-    );
-  }*/
-
-
 
     render() {
         return (
@@ -231,7 +219,7 @@ class App extends Component<Props> {
                 style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
-                placeholder = "MM/DD/YY"
+                placeholder = "MM/DD/YYYY"
 								placeholderTextColor = "black"
                 />
 
@@ -322,6 +310,8 @@ class App extends Component<Props> {
     }
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
+// DistributedList Proof of Concept
 
 type Props = {};
 class Dlist extends Component<Props> {
@@ -360,7 +350,7 @@ class Dlist extends Component<Props> {
 
   connectToFirstDevice = () => {
       console.warn(this.state.devices[0]);
-      connect(this.state.devices[0].deviceAddress)
+      connect('ce:c0:79:87:1b:86')
           .then(() => console.warn('Successfully connected'))
           .catch(err => console.error('Something gone wrong. Details: ', err));
   };
