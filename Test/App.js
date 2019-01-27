@@ -9,7 +9,6 @@ import {
 	ScrollView,
 	View
 	} from 'react-native';
-import nodejs from 'nodejs-mobile-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
