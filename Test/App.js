@@ -7,7 +7,8 @@ import {
 	StyleSheet,
 	Text,
 	ScrollView,
-	View
+  View,
+  PermissionsAndroid 
 	} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
@@ -32,7 +33,7 @@ import {
   receiveMessage,
   sendMessage
 } from 'react-native-wifi-p2p';
-import { PermissionsAndroid } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 
 const dirs = RNFetchBlob.fs.dirs
 var path = dirs.DocumentDir + '/my.csv';
@@ -69,7 +70,10 @@ class App extends Component<Props> {
 			gndr: ""
         };
     }
-
+    onPressInfo(){
+      const name = DeviceInfo.getDeviceName();
+      alert(name);
+    }
 		onPressTest(){
 			var num = 1;
 			var temp = 10000000;
@@ -286,6 +290,10 @@ class App extends Component<Props> {
             		/>
 								<Button  onPress ={this.getDate.bind(this)}
             			title="Get Date"
+            			color='purple'
+            		/>
+                <Button  onPress ={this.onPressInfo.bind(this)}
+            			title="Device Info"
             			color='purple'
             		/>
                 <Button
