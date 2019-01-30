@@ -9,7 +9,6 @@ import {
 	ScrollView,
 	View
 	} from 'react-native';
-import nodejs from 'nodejs-mobile-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
@@ -34,6 +33,9 @@ import {
   sendMessage
 } from 'react-native-wifi-p2p';
 import { PermissionsAndroid } from 'react-native';
+
+import RedisClient from "react-native-redispubsub";
+import {DeviceEventEmitter} from 'react-native';
 
 const dirs = RNFetchBlob.fs.dirs
 var path = dirs.DocumentDir + '/my.csv';
@@ -320,6 +322,15 @@ class Dlist extends Component<Props> {
   this.state = {
     devices: []
   };
+  
+  RedisClient.redisConnect("192.168.1.215:6379");
+    RedisClient.subscribe("androidChannel");
+
+    DeviceEventEmitter.addListener('androidChannel', function(e: Event) {
+        alert(e);
+      });
+      RedisClient.publish("featureChannel","GOT IT :D");
+  }
 }
 
   componentDidMount() {

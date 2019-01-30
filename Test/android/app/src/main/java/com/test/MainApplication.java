@@ -5,7 +5,8 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.sha256lib.Sha256Package;
 import com.RNFetchBlob.RNFetchBlobPackage;
-import com.janeasystems.rn_nodejs_mobile.RNNodeJsMobilePackage;
+import com.sha256lib.Sha256Package;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -28,7 +29,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNNodeJsMobilePackage(),
             new Sha256Package(),
             new RNFetchBlobPackage(),
 			new WiFiP2PManagerPackage()

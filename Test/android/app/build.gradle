@@ -103,6 +103,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -121,6 +122,12 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    packagingOptions {
+       pickFirst 'META-INF/INDEX.LIST'
+       pickFirst 'META-INF/LICENSE'
+       //pickFirst 'META-INF/rxjava.properties'
+       pickFirst 'META-INF/io.netty.versions.properties'
+   }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -137,10 +144,8 @@ android {
 }
 
 dependencies {
-    compile project(':nodejs-mobile-react-native')
     implementation project(':react-native-sha256')
     implementation project(':rn-fetch-blob')
-    implementation project(':nodejs-mobile-react-native')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
