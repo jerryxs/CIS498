@@ -15,35 +15,21 @@ import {
 	StyleSheet,
 	Text,
 	View,
+	ScrollView
 	} from 'react-native';
 import {
 	createStackNavigator,
 	stackActions,
 	NavigationActions,
+	DrawerNavigator
 } from 'react-navigation';
 import nodejs from 'nodejs-mobile-react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import {sha256} from 'react-native-sha256';
 import { KeyboardAvoidingView } from 'react-native';
+import SettingScreen from './screens/SettingScreen'
+import HomeScreen from './screens/HomeScreen'
 
-
-//import { Zyre } from "zyre";
-
-//const Zyre = require('zyre.js');
-
-//New zyre object
-/*const zyre = new Zyre({
-  name: 'foo',      // Name of the zyre node
-  iface: 'eth0',    // Network interface
-  headers: {        // Headers will be sent on every new connection
-    foo: 'bar',
-  },
-  evasive: 5000,    // Timeout after which the local node will try to ping a not responding peer
-  expired: 30000,   // Timeout after which a not responding peer gets disconnected
-  port: 49152,      // Port for incoming messages, will be incremented if already in use
-  bport: 5670,      // Discovery beacon broadcast port
-  binterval: 1000,  // Discovery beacon broadcast interval
-});*/
 
 const instructions = Platform.select({
 
@@ -150,38 +136,13 @@ export default class App extends Component<Props> {
 				})
 			})
 
-		  /*RNFetchBlob.fs.hash(path, 'sha256')
-		  .then((hash) => {
 
-
-			})*/
-
-
-
-
-
-
-	  // just makes a warning pop up with the data entered in the text boxes
-	  //console.warn(csvData);
 
     }
-	//Backend for zyre
-	componentWillMount()
-  {
-    nodejs.start('main.js');
-    nodejs.channel.addListener(
-      'message',
-      (msg) => {
-        alert('From node: ' + msg);
-      },
-      this
-    );
-  }
-
-
-
     render() {
         return (
+
+
 					<KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
 
 							  <View style={{flex: 1}}>
@@ -260,15 +221,14 @@ export default class App extends Component<Props> {
 								<View style={{ backgroundColor: '#1D7AE7',borderRadius: 3,padding: 10}} >
 										<Button onPress ={this.onPressEnterData.bind(this)}
             				title="Submit"
-            				color='black'
+            				color='#1D7AE7'
 										>
             				</Button>
 									</View>
-
 			  	<View style={{ backgroundColor: '#D0071F',borderRadius: 3,padding: 10}} >
 						<Button onPress={() => nodejs.channel.send('A message!')}
              title="Message Node"
-						 color="black"
+						 color="#D0071F"
 						>
 						</Button>
 						</View>
@@ -277,38 +237,42 @@ export default class App extends Component<Props> {
 
 
                 </View>
-								</KeyboardAvoidingView>
+							  </KeyboardAvoidingView>
 
                 );
     }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 30,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-		fontSize: 17
-  },
-  license: {
-    height: 40,
-    width: 100,
-    borderColor: 'black',
-    borderWidth: 2
- },
 
-});
 
-//needed since we are not using create-react-native-app
-AppRegistry.registerComponent('Test', () => UselessTextInput);
+
+		const styles = StyleSheet.create({
+		  container: {
+		    flex: 1,
+		    justifyContent: 'center',
+		    alignItems: 'center',
+		    backgroundColor: '#F5FCFF',
+		  },
+		  welcome: {
+		    fontSize: 30,
+		    textAlign: 'center',
+		    margin: 10,
+		  },
+		  instructions: {
+		    textAlign: 'center',
+		    color: '#333333',
+		    marginBottom: 5,
+				fontSize: 17
+		  },
+		  license: {
+		    height: 40,
+		    width: 100,
+		    borderColor: 'black',
+		    borderWidth: 2
+		 },
+
+		});
+
+
+		//needed since we are not using create-react-native-app
+		AppRegistry.registerComponent('Test', () => UselessTextInput);
