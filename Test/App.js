@@ -39,9 +39,9 @@ export default class App extends Component<Props> {
 	//Add states for input boxes
     constructor(props) {
         super(props);
-        
-        this.socket = io('http://172.18.0.10:8000'); // connects to the local server
 
+        this.socket = io('http://172.18.0.10:8000'); // connects to the local server
+        // Use this area to listen to signals from server and do something...
         this.state = {
 			licNum: "",
 			dob: "",
@@ -52,11 +52,6 @@ export default class App extends Component<Props> {
 			st8: "",
 			gndr: ""
         };
-    }
-    onPressInfo(){
-      DeviceInfo.getMACAddress().then(mac => {
-        alert(mac);
-      });
     }
 		onPressTest(){
 			var num = 1;
@@ -159,7 +154,8 @@ export default class App extends Component<Props> {
 							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
 							return stream.close()
 						})
-						alert('Guest Added To The Event List!')
+            alert('Guest Added To The Event List!')
+            this.socket.emit('onPressEnterData', {csvData});
 					}
 
 				})

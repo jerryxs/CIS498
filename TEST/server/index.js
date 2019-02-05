@@ -13,4 +13,9 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
     // log the socket ID of the device
     console.log(socket.id);
+
+    socket.on('onPressEnterData', (data) => {
+        console.log('We Gotem');
+        console.log(data.csvData);
+    })
 });
