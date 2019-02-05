@@ -12,28 +12,8 @@ import {
 	} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
-import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
-import {
-  initialize,
-  isSuccessfulInitialize,
-  startDiscoveringPeers,
-  stopDiscoveringPeers,
-  unsubscribeFromPeersUpdates,
-  unsubscribeFromConnectionInfoUpdates,
-  subscribeOnConnectionInfoUpdates,
-  subscribeOnPeersUpdates,
-  connect,
-  disconnect,
-  createGroup,
-  removeGroup,
-  getAvailablePeers,
-  sendFile,
-  receiveFile,
-  getConnectionInfo,
-  receiveMessage,
-  sendMessage
-} from 'react-native-wifi-p2p';
-import DeviceInfo from 'react-native-device-info';
+import io from 'socket.io-client/dist/socket.io';
+//import DeviceInfo from 'react-native-device-info';
 
 const dirs = RNFetchBlob.fs.dirs
 var path = dirs.DocumentDir + '/my.csv';
@@ -54,11 +34,14 @@ var path = dirs.DocumentDir + '/my.csv';
 })
 
 type Props = {};
-class App extends Component<Props> {
+export default class App extends Component<Props> {
 
 	//Add states for input boxes
     constructor(props) {
         super(props);
+        
+        this.socket = io('http://172.18.0.10:8000'); // connects to the local server
+
         this.state = {
 			licNum: "",
 			dob: "",
@@ -71,8 +54,9 @@ class App extends Component<Props> {
         };
     }
     onPressInfo(){
-      const name = DeviceInfo.getDeviceName();
-      alert(name);
+      DeviceInfo.getMACAddress().then(mac => {
+        alert(mac);
+      });
     }
 		onPressTest(){
 			var num = 1;
@@ -292,22 +276,6 @@ class App extends Component<Props> {
             			title="Get Date"
             			color='purple'
             		/>
-                <Button  onPress ={this.onPressInfo.bind(this)}
-            			title="Device Info"
-            			color='purple'
-            		/>
-                <Button
-                       title="Nodes"
-                       onPress = {() => {
-                       this.props.navigation.dispatch(StackActions.reset({
-                             index: 0,
-                             actions: [
-                                       NavigationActions.navigate({ routeName: 'DistributedList'})
-                                       ],
-                             }))
-                       }}
-                       color='purple'
-                       />
 								</View>
 
 
@@ -316,174 +284,6 @@ class App extends Component<Props> {
                 );
     }
 }
-
-// --------------------------------------------------------------------------------------------------------------------------
-// DistributedList Proof of Concept
-
-type Props = {};
-class Dlist extends Component<Props> {
-	constructor(props){
-	super(props);
-  this.state = {
-    devices: []
-  };
-}
-
-  componentDidMount() {
-    initialize();
-    isSuccessfulInitialize()
-        .then(status => console.warn(status));
-    startDiscoveringPeers()
-        .then(() => console.warn('Sucessfull'))
-        .catch(err => console.warn(err));
-
-    subscribeOnPeersUpdates(({ devices }) => this.handleNewPeers(devices));
-    subscribeOnConnectionInfoUpdates(this.handleNewInfo);
-  }
-
-  componentWillUnmount() {
-    unsubscribeFromConnectionInfoUpdates((event) => console.log('unsubscribeFromConnectionInfoUpdates', event));
-    unsubscribeFromPeersUpdates((event) => console.log('unsubscribeFromPeersUpdates', event));
-  }
-
-  handleNewInfo = (info, sceondParam) => {
-    console.warn(64646776467, info);
-  };
-
-  handleNewPeers = (peers) => {
-    console.log(754862162442324, peers);
-    this.setState({ devices: peers });
-  };
-
-  connectToFirstDevice = () => {
-      console.warn(this.state.devices[0]);
-      connect('ce:c0:79:87:1b:86')
-          .then(() => console.warn('Successfully connected'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  disconnectFromDevice = () => {
-      disconnect()
-          .then(() => console.log(2423435423, 'Successfully disconnected'))
-          .catch(err => console.error(2423435423, 'Something gone wrong. Details: ', err));
-  };
-
-  onCreateGroup = () => {
-      createGroup()
-          .then(() => console.warn('Group created successfully!'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  onRemoveGroup = () => {
-      removeGroup()
-          .then(() => console.warn('Currently you don\'t belong to group!'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  onStopInvestigation = () => {
-      stopDiscoveringPeers()
-          .then(() => console.warn('Stopping of discovering was successful'))
-          .catch(err => console.error(`Something is gone wrong. Maybe your WiFi is disabled? Error details`, err));
-  };
-
-  onStartInvestigate = () => {
-      startDiscoveringPeers()
-          .then(status => console.warn(33333333, `Status of discovering peers: ${status}`))
-          .catch(err => console.error(`Something is gone wrong. Maybe your WiFi is disabled? Error details: ${err}`));
-  };
-
-  onGetAvailableDevices = () => {
-      getAvailablePeers()
-          .then(peers => console.warn(peers));
-  };
-
-  onSendMessage = () => {
-      sendMessage("Hello world!")
-        .then(() => console.warn('Message sent successfully'))
-        .catch(err => console.log('Error while message sending', err));
-  };
-
-  onReceiveMessage = () => {
-      receiveMessage()
-          .then((msg) => alert('Message received successfully ' +  msg))
-          .catch(err => console.warn('Error while message receiving', err))
-  };
-
-  onGetConnectionInfo = () => {
-    getConnectionInfo()
-        .then(info => console.warn(info));
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <Button
-          title="Connect"
-          onPress={this.connectToFirstDevice}
-        />
-        <Button
-          title="Disconnect"
-          onPress={this.disconnectFromDevice}
-        />
-        <Button
-          title="Create group"
-          onPress={this.onCreateGroup}
-        />
-        <Button
-          title="Remove group"
-          onPress={this.onRemoveGroup}
-        />
-        <Button
-          title="Investigate"
-          onPress={this.onStartInvestigate}
-        />
-        <Button
-          title="Prevent Investigation"
-          onPress={this.onStopInvestigation}
-        />
-        <Button
-          title="Get Available Devices"
-          onPress={this.onGetAvailableDevices}
-        />
-        <Button
-          title="Get connection Info"
-          onPress={this.onGetConnectionInfo}
-        />
-        <Button
-          title="Send message"
-          onPress={this.onSendMessage}
-        />
-        <Button
-          title="Receive message"
-          onPress={this.onReceiveMessage}
-        />
-
-        <Button
-               title="Return"
-               onPress = {() => {
-               this.props.navigation.dispatch(StackActions.reset({
-                     index: 0,
-                     actions: [
-                               NavigationActions.navigate({ routeName: 'UserInput'})
-                               ],
-                     }))
-               }}
-               color='steelblue'
-               />
-      </View>
-    );
-  }
-}
-
-export default createStackNavigator({
-            DistributedList: {
-            screen: Dlist,
-            },
-            UserInput: {
-            screen: App,
-            },
-        }, { initialRouteName: 'UserInput',
-    });
 
 const styles = StyleSheet.create({
   container: {

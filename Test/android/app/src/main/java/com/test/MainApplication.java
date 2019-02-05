@@ -9,9 +9,6 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import io.wifi.p2p.WiFiP2PManagerPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,9 +25,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
             new Sha256Package(),
-            new RNFetchBlobPackage(),
-			      new WiFiP2PManagerPackage(),
-            new RNDeviceInfo()
+            new RNFetchBlobPackage()
       );
     }
 
