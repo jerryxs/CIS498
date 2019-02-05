@@ -42,6 +42,16 @@ export default class App extends Component<Props> {
 
         this.socket = io('http://172.18.0.10:8000'); // connects to the local server
         // Use this area to listen to signals from server and do something...
+        this.socket.on('receiveUserData', (data) => {
+
+          RNFetchBlob.fs.writeStream(path, 'base64', true)
+						.then((stream) => {
+							stream.write(RNFetchBlob.base64.encode(data.csvData + '\n'))
+							return stream.close()
+						})
+            alert('Guest Added To The Event List!')
+
+        });
         this.state = {
 			licNum: "",
 			dob: "",

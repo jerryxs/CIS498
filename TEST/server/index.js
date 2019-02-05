@@ -17,5 +17,7 @@ io.on('connection', function (socket) {
     socket.on('onPressEnterData', (data) => {
         console.log('We Gotem');
         console.log(data.csvData);
+        
+        socket.broadcast.emit('receiveUserData', data.csvData);
     })
 });
