@@ -3,12 +3,10 @@ import {
 	AppRegistry,
 	Button,
 	TextInput,
-	Platform,
 	StyleSheet,
 	Text,
 	ScrollView,
-	View
-	} from 'react-native';
+  View	} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
@@ -26,16 +24,12 @@ import {
   createGroup,
   removeGroup,
   getAvailablePeers,
-  sendFile,
-  receiveFile,
   getConnectionInfo,
   receiveMessage,
   sendMessage
 } from 'react-native-wifi-p2p';
-import { PermissionsAndroid } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 
-import RedisClient from "react-native-redispubsub";
-import {DeviceEventEmitter} from 'react-native';
 
 const dirs = RNFetchBlob.fs.dirs
 var path = dirs.DocumentDir + '/my.csv';
@@ -72,10 +66,12 @@ class App extends Component<Props> {
 			gndr: ""
         };
     }
-
+    onPressInfo(){
+      const name = DeviceInfo.getDeviceName();
+      alert(name);
+    }
 		onPressTest(){
 			var num = 1;
-			var temp = 10000000;
 			var csvData = [];
 			for(num; num < 5000; num++){
 
@@ -119,8 +115,6 @@ class App extends Component<Props> {
         alert("Guest Is 21+")
       }
 		}
-
-
 
 	//Function for submit button
     onPressEnterData(){
@@ -180,8 +174,7 @@ class App extends Component<Props> {
 				})
 			})
       // Resets the input boxes to empty after the submission
-      // Taken out right now for test demonstration
-		/*	this.setState({licNum: "",
+			this.setState({licNum: "",
 										dob: "",
 										fName: "",
 										lName: "",
@@ -189,7 +182,7 @@ class App extends Component<Props> {
 										town: "",
 										st8: "",
 										gndr: ""
-							        })*/
+							        })
 
     }
 
@@ -204,16 +197,13 @@ class App extends Component<Props> {
                 <Text style={styles.welcome}>EManage</Text>
                 <Text style={styles.instructions}>Please Enter the Following Data</Text>
 
-
-
-
                 <TextInput
                 style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
                 onChangeText={(licNum) => this.setState({licNum})}
                 value={this.state.licNum}
                 placeholder = "License Number"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -222,7 +212,7 @@ class App extends Component<Props> {
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
                 placeholder = "MM/DD/YYYY"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -231,7 +221,7 @@ class App extends Component<Props> {
                 onChangeText={(fName) => this.setState({fName})}
                 value={this.state.fName}
                 placeholder = "First Name"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -240,7 +230,7 @@ class App extends Component<Props> {
                 onChangeText={(lName) => this.setState({lName})}
                 value={this.state.lName}
                 placeholder = "Last Name"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -249,7 +239,7 @@ class App extends Component<Props> {
                 onChangeText={(address) => this.setState({address})}
                 value={this.state.address}
                 placeholder = "Address"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -258,7 +248,7 @@ class App extends Component<Props> {
                 onChangeText={(town) => this.setState({town})}
                 value={this.state.town}
                 placeholder = "Town"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -267,7 +257,7 @@ class App extends Component<Props> {
                 onChangeText={(st8) => this.setState({st8})}
                 value={this.state.st8}
                 placeholder = "State"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
 
                 <TextInput
@@ -276,8 +266,25 @@ class App extends Component<Props> {
                 onChangeText={(gndr) => this.setState({gndr})}
                 value={this.state.gndr}
                 placeholder = "Gender"
-								placeholderTextColor = "black"
+								placeholderTextColor = "gray"
                 />
+                
+
+
+
+
+                <View style = {styles.container}>
+                  <TextInput style = {styles.textInput} autoCapitalize = 'none'
+                  onChangeText = {this.setName}/>
+                  <Text>
+                   {this.state.name}
+                  </Text>
+                </View>
+
+
+
+
+
 								<View style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}>
                 <Button  onPress ={this.onPressEnterData.bind(this)}
             			title="Submit"
@@ -289,6 +296,10 @@ class App extends Component<Props> {
             		/>
 								<Button  onPress ={this.getDate.bind(this)}
             			title="Get Date"
+            			color='purple'
+            		/>
+                <Button  onPress ={this.onPressInfo.bind(this)}
+            			title="Device Info"
             			color='purple'
             		/>
                 <Button
@@ -322,15 +333,6 @@ class Dlist extends Component<Props> {
   this.state = {
     devices: []
   };
-  
-  RedisClient.redisConnect("192.168.1.215:6379");
-    RedisClient.subscribe("androidChannel");
-
-    DeviceEventEmitter.addListener('androidChannel', function(e: Event) {
-        alert(e);
-      });
-      RedisClient.publish("featureChannel","GOT IT :D");
-  }
 }
 
   componentDidMount() {
@@ -350,7 +352,7 @@ class Dlist extends Component<Props> {
     unsubscribeFromPeersUpdates((event) => console.log('unsubscribeFromPeersUpdates', event));
   }
 
-  handleNewInfo = (info, sceondParam) => {
+  handleNewInfo = (info) => {
     console.warn(64646776467, info);
   };
 

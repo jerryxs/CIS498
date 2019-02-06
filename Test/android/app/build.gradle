@@ -103,7 +103,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -122,12 +121,6 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-    packagingOptions {
-       pickFirst 'META-INF/INDEX.LIST'
-       pickFirst 'META-INF/LICENSE'
-       //pickFirst 'META-INF/rxjava.properties'
-       pickFirst 'META-INF/io.netty.versions.properties'
-   }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -144,6 +137,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-device-info')
     implementation project(':react-native-sha256')
     implementation project(':rn-fetch-blob')
     implementation fileTree(dir: "libs", include: ["*.jar"])
