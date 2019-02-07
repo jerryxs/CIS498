@@ -145,6 +145,7 @@ export default class App extends Component<Props> {
 								showMessage({
 									message: "Duplicate Warning!",
 									description: "Guest Has Already Entered The Event",
+									duration: 3000,
 									type: "info",
 									backgroundColor: "red",
 								});
@@ -171,15 +172,17 @@ export default class App extends Component<Props> {
 								if(age >= 21)
 					      {
 									showMessage({
-			              message: "21+ guest added to event!",
+			              message: "21+ Guest Added to Event!",
 			              type: "info",
+										duration: 3000,
 										backgroundColor: "green",
 			            });
 		            //alert('21+ guest added to event!')
 							}else{
 								showMessage({
-		              message: "under 21 guest added to the event!",
+		              message: "Under 21 Guest Added to the Event!",
 		              type: "info",
+									duration: 3000,
 									backgroundColor: "blue",
 		            });
 								//alert('under 21 guest added to the event!')
