@@ -1,5 +1,5 @@
 {
-  "name": "Test",
+  "name": "TEST",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "nodemon": "^1.18.9",
-    "react": "^16.6.3",
-    "react-native": "^0.58.3",
+    "react": "16.6.3",
+    "react-native": "0.58.4",
     "react-native-sha256": "^1.2.3",
     "react-native-socketio": "^0.3.0",
     "rn-fetch-blob": "^0.10.15",
@@ -19,8 +19,9 @@
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
-    "babel-jest": "23.6.0",
-    "jest": "23.6.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "24.1.0",
+    "jest": "24.1.0",
     "metro-react-native-babel-preset": "0.51.1",
     "react-test-renderer": "16.6.3"
   },
