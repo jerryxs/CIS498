@@ -8,11 +8,12 @@ import {
 	Text,
 	ScrollView,
   View,
-  PermissionsAndroid 
+  PermissionsAndroid
 	} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import io from 'socket.io-client/dist/socket.io';
+import FlashMessage, {showMessage, hideMessage} from "react-native-flash-message";
 //import DeviceInfo from 'react-native-device-info';
 
 const dirs = RNFetchBlob.fs.dirs
@@ -40,7 +41,7 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props);
 
-        this.socket = io('http://172.18.13.203:8000'); // connects to the local server
+        this.socket = io('http://172.18.29.131:8000'); // connects to the local server
         // Use this area to listen to signals from server and do something...
         this.socket.on('receiveUserData', (data) => {
 
@@ -64,6 +65,7 @@ export default class App extends Component<Props> {
 			gndr: ""
         };
     }
+
 		onPressTest(){
 			var num = 1;
 			var temp = 10000000;
@@ -95,21 +97,7 @@ export default class App extends Component<Props> {
 			}
 			console.warn("done");
 		}
-		getDate()
-		{
-			var today = new Date();
-    	var birthDate = new Date(this.state.dob);
-	    var age = today.getFullYear() - birthDate.getFullYear();
-	    var m = today.getMonth() - birthDate.getMonth();
-	    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
-			{
-	        age--;
-	    }
-			if(age >= 21)
-      {
-        alert("Guest Is 21+")
-      }
-		}
+
 
 
 
@@ -152,24 +140,55 @@ export default class App extends Component<Props> {
 
 				})
 
-				stream.onEnd(() => {
-					if(data.includes(csvData[0])){
-						alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
-						//console.warn(csvData[0], " Is already in the file");
-					}
-					else{
+						stream.onEnd(() => {
+							if(data.includes(csvData[0])){
+								showMessage({
+									message: "Duplicate Warning!",
+									description: "Guest Has Already Entered The Event",
+									type: "info",
+									backgroundColor: "red",
+								});
+								//alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
+								//console.warn(csvData[0], " Is already in the file");
+							}
+							else{
 
-						//Append the input data to the file
-						RNFetchBlob.fs.writeStream(path, 'base64', true)
-						.then((stream) => {
-							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
-							return stream.close()
+
+								//Append the input data to the file
+								RNFetchBlob.fs.writeStream(path, 'base64', true)
+								.then((stream) => {
+									stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
+									return stream.close()
+								})
+								var today = new Date();
+					    	var birthDate = new Date(this.state.dob);
+						    var age = today.getFullYear() - birthDate.getFullYear();
+						    var m = today.getMonth() - birthDate.getMonth();
+						    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+								{
+						        age--;
+						    }
+								if(age >= 21)
+					      {
+									showMessage({
+			              message: "21+ guest added to event!",
+			              type: "info",
+										backgroundColor: "green",
+			            });
+		            //alert('21+ guest added to event!')
+							}else{
+								showMessage({
+		              message: "under 21 guest added to the event!",
+		              type: "info",
+									backgroundColor: "blue",
+		            });
+								//alert('under 21 guest added to the event!')
+							}
+		            this.socket.emit('onPressEnterData', {csvData});
+							}
+
 						})
-            alert('Guest Added To The Event List!')
-            this.socket.emit('onPressEnterData', {csvData});
-					}
 
-				})
 			})
       // Resets the input boxes to empty after the submission
       // Taken out right now for test demonstration
@@ -279,14 +298,12 @@ export default class App extends Component<Props> {
             			title="Test"
             			color='purple'
             		/>
-								<Button  onPress ={this.getDate.bind(this)}
-            			title="Get Date"
-            			color='purple'
-            		/>
+
 								</View>
 
 
 								</View>
+								<FlashMessage position="top"/>
                 </ScrollView>
                 );
     }
