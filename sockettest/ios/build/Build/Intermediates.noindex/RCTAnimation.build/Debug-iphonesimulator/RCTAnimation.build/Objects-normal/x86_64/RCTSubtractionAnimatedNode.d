@@ -1,5 +1,0 @@
-dependencies: \
-  /Users/istpierre/Documents/socketTest/sockettest/node_modules/react-native/Libraries/NativeAnimation/Nodes/RCTSubtractionAnimatedNode.m \
-  /Users/istpierre/Documents/socketTest/sockettest/node_modules/react-native/Libraries/NativeAnimation/Nodes/RCTSubtractionAnimatedNode.h \
-  /Users/istpierre/Documents/socketTest/sockettest/node_modules/react-native/Libraries/NativeAnimation/Nodes/RCTValueAnimatedNode.h \
-  /Users/istpierre/Documents/socketTest/sockettest/node_modules/react-native/Libraries/NativeAnimation/Nodes/RCTAnimatedNode.h
