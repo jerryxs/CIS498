@@ -131,25 +131,22 @@ export default class App extends Component<Props> {
 		};
 
 
-		/*InteractionManager.runAfterInteractions(() => {
-
-
-			// ...long-running synchronous task...
-		});*/
 
 		sha256(dataStored.licNum).then( hash => {
 			dataStored.licNum = hash
 			console.warn(dataStored.licNum);
 		})
 
-
 		sha256(dataStored.address).then( hash => {
 			dataStored.address = hash
 			console.warn(dataStored.address);
 		})
+		sleep ( 1);
 
 		console.warn(dataStored.licNum);
+		console.warn('dup check: ', dataStored.licNum);
 		storage.load({
+
     // same dynamic key
     key: dataStored.licNum,
 
@@ -192,7 +189,7 @@ export default class App extends Component<Props> {
 			console.warn('Saved data: ', dataStored.licNum);
 
       this.socket.emit('onPressEnterData', {dataStored});
-
+			console.warn('Saved data: ', dataStored.licNum);
       storage.save({
         // dynamic key
         key: dataStored.licNum, // Note: Do not use underscore("_") in key!
