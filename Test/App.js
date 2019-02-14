@@ -8,6 +8,7 @@ import {
 	AsyncStorage,
 	Text,
 	ScrollView,
+	InteractionManager,
   View,
   PermissionsAndroid
 	} from 'react-native';
@@ -47,7 +48,7 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props);
 
-        this.socket = io('http://172.18.27.61:8000'); // connects to the local server
+        this.socket = io('http://134.88.133.46:8000'); // connects to the local server
         // Use this area to listen to signals from server and do something...
         this.socket.on('receiveUserData', (data) => {
 
@@ -111,27 +112,46 @@ export default class App extends Component<Props> {
 			console.warn("done");
 		}
 
-
+		 
 
 
 	//Function for submit button
     onPressEnterData(){
-	  //When submit is pressed, an array is populated with the new state of each input box
+		//When submit is pressed, an array is populated with the new state of each input box
 		
+		const dataStored = {
+			licNum: this.state.licNum,
+			dob: this.state.dob,
+			fName: this.state.fName,
+			lName: this.state.lName,
+			address: this.state.address,
+			town: this.state.town,
+			st8: this.state.st8,
+			gndr: this.state.gndr
+		};
 		
-		// Needs tested...
-		/*sha256(csvData[0]).then( hash => {
-			csvData[0] = hash
-    //console.warn(csvData[0]);
-		})
-		sha256(csvData[4]).then( hash => {
-			csvData[4] = hash
-    //console.warn(csvData[4]);
-		})*/
 
+		/*InteractionManager.runAfterInteractions(() => {
+
+			
+			// ...long-running synchronous task...
+		});*/
+
+		sha256(dataStored.licNum).then( hash => {
+			dataStored.licNum = hash
+			console.warn(dataStored.licNum); 
+		})
+
+		
+		sha256(dataStored.address).then( hash => {
+			dataStored.address = hash
+			console.warn(dataStored.address); 
+		})
+		
+		console.warn(dataStored.licNum);
 		storage.load({
     // same dynamic key
-    key: this.state.licNum,
+    key: dataStored.licNum,
   
     // autoSync (default: true) means if data is not found or has expired,
     // then invoke the corresponding sync method
@@ -169,22 +189,13 @@ export default class App extends Component<Props> {
     switch (err.name) {
 			case 'NotFoundError':
 
-      const dataStored = {
-        licNum: this.state.licNum,
-				dob: this.state.dob,
-				fName: this.state.fName,
-				lName: this.state.lName,
-				address: this.state.address,
-				town: this.state.town,
-				st8: this.state.st8,
-				gndr: this.state.gndr
-			};
+			console.warn('Saved data: ', dataStored.licNum);
 			
       this.socket.emit('onPressEnterData', {dataStored});
 			
       storage.save({
         // dynamic key
-        key: this.state.licNum, // Note: Do not use underscore("_") in key!
+        key: dataStored.licNum, // Note: Do not use underscore("_") in key!
         data: dataStored,
       
         // if expires not specified, the defaultExpires will be applied instead.
