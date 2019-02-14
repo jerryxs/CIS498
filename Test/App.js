@@ -11,7 +11,6 @@ import {
   View,
   PermissionsAndroid
 	} from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import io from 'socket.io-client/dist/socket.io';
 import FlashMessage, {showMessage, hideMessage} from "react-native-flash-message";
