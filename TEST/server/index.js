@@ -16,7 +16,7 @@ io.on('connection', function (socket) {
 
     socket.on('onPressEnterData', (data) => {
         console.log('We Gotem');
-        console.log(data.csvData);
+        console.log(data.dataStored);
 
         //const user = data.csvData;
         

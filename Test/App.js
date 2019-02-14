@@ -5,34 +5,41 @@ import {
 	TextInput,
 	Platform,
 	StyleSheet,
+	AsyncStorage,
 	Text,
 	ScrollView,
+	InteractionManager,
   View,
   PermissionsAndroid
 	} from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
 import { sha256 } from 'react-native-sha256';
 import io from 'socket.io-client/dist/socket.io';
 import FlashMessage, {showMessage, hideMessage} from "react-native-flash-message";
+import Storage from 'react-native-storage';
 //import DeviceInfo from 'react-native-device-info';
 
-const dirs = RNFetchBlob.fs.dirs
-var path = dirs.DocumentDir + '/my.csv';
-	/*
-	 * Check to see if the CSV file exists
-	 * If it does then skip this portion as to not add the headers again
-	 * If not then create this file at the file path for android and add headers
-	 */
-	 RNFetchBlob.fs.exists(path)
-.then((exist) => {
-    if(exist === false){
-			RNFetchBlob.fs.writeStream(path, 'base64', true)
-		     .then((stream) => {
-		         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
-		         return stream.close()
-		     })
-		}
-})
+const storage = new Storage({
+  // maximum capacity, default 1000
+  size: 5000,
+
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {
+
+  }
+});
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -41,19 +48,25 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props);
 
-        this.socket = io('http://172.18.29.131:8000'); // connects to the local server
+        this.socket = io('http://134.88.133.46:8000'); // connects to the local server
         // Use this area to listen to signals from server and do something...
         this.socket.on('receiveUserData', (data) => {
 
-          RNFetchBlob.fs.writeStream(path, 'base64', true)
-						.then((stream) => {
-              stream.write(RNFetchBlob.base64.encode(data.data.csvData + '\n'))
-              console.warn(data.data.csvData);
-							return stream.close()
-						})
+					console.warn('Got it!', data.data.dataStored);
+					storage.save({
+						// dynamic key
+						key: data.data.dataStored.licNum, // Note: Do not use underscore("_") in key!
+						data: data.data.dataStored,
+
+						// if expires not specified, the defaultExpires will be applied instead.
+						// if set to null, then it will never expire.
+						expires: 1000 * 3600
+					});
+
             alert('Guest Added To The Event List!')
 
-        });
+				});
+
         this.state = {
 			licNum: "",
 			dob: "",
@@ -67,6 +80,7 @@ export default class App extends Component<Props> {
     }
 
 		onPressTest(){
+			/* Need to set up new test... will only be size of max set above
 			var num = 1;
 			var temp = 10000000;
 			var csvData = [];
@@ -94,7 +108,7 @@ export default class App extends Component<Props> {
 			 })
 
 				csvData[0] = 10000000;
-			}
+			}*/
 			console.warn("done");
 		}
 
@@ -103,96 +117,125 @@ export default class App extends Component<Props> {
 
 	//Function for submit button
     onPressEnterData(){
-	  //When submit is pressed, an array is populated with the new state of each input box
-	  var csvData = [
+		//When submit is pressed, an array is populated with the new state of each input box
 
-		 this.state.licNum,
-		 this.state.dob,
-		 this.state.fName,
-		 this.state.lName,
-		 this.state.address,
-		 this.state.town,
-		 this.state.st8,
-		 this.state.gndr
+		const dataStored = {
+			licNum: this.state.licNum,
+			dob: this.state.dob,
+			fName: this.state.fName,
+			lName: this.state.lName,
+			address: this.state.address,
+			town: this.state.town,
+			st8: this.state.st8,
+			gndr: this.state.gndr
+		};
 
-	  ];
 
-		sha256(csvData[0]).then( hash => {
-			csvData[0] = hash
-    //console.warn(csvData[0]);
+		/*InteractionManager.runAfterInteractions(() => {
+
+
+			// ...long-running synchronous task...
+		});*/
+
+		sha256(dataStored.licNum).then( hash => {
+			dataStored.licNum = hash
+			console.warn(dataStored.licNum);
 		})
-		sha256(csvData[4]).then( hash => {
-			csvData[4] = hash
-    //console.warn(csvData[4]);
+
+
+		sha256(dataStored.address).then( hash => {
+			dataStored.address = hash
+			console.warn(dataStored.address);
 		})
 
-	  //console.warn("Directory: ", dirs.DocumentDir);
-	  //Array is indexed properly can store csvData[0] into string to dup check
-	  //console.warn("Array[0]: ", csvData[0]);
-		  //Read file before adding new info to it
-		  //Currently just reads the file and spits out the info in a warn
-		  RNFetchBlob.fs.readStream(path, 'utf8')
-			.then((stream) => {
-				let data = ''
-				stream.open()
-				stream.onData((chunk) => {
-					data += chunk
+		console.warn(dataStored.licNum);
+		storage.load({
+    // same dynamic key
+    key: dataStored.licNum,
 
-				})
+    // autoSync (default: true) means if data is not found or has expired,
+    // then invoke the corresponding sync method
+    autoSync: true,
 
-						stream.onEnd(() => {
-							if(data.includes(csvData[0])){
-								showMessage({
-									message: "Duplicate Warning!",
-									description: "Guest Has Already Entered The Event",
-									duration: 3000,
-									type: "info",
-									backgroundColor: "red",
-								});
-								//alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
-								//console.warn(csvData[0], " Is already in the file");
-							}
-							else{
+    // syncInBackground (default: true) means if data expired,
+    // return the outdated data first while invoking the sync method.
+    // If syncInBackground is set to false, and there is expired data,
+    // it will wait for the new data and return only after the sync completed.
+    // (This, of course, is slower)
+    syncInBackground: true,
+
+    // you can pass extra params to the sync method
+    syncParams: {
+      extraFetchOptions: {
+				// none
+      },
+      someFlag: true
+    }
+  })
+  .then(ret => {
+    // found data go to then()
+    showMessage({
+			message: "Duplicate Warning!",
+			description: "Guest Has Already Entered The Event",
+			duration: 3000,
+			type: "info",
+			backgroundColor: "red",
+		});
+  })
+  .catch(err => {
+    // any exception including data not found
+    // goes to catch()
+    //console.warn(err.message);
+    switch (err.name) {
+			case 'NotFoundError':
+
+			console.warn('Saved data: ', dataStored.licNum);
+
+      this.socket.emit('onPressEnterData', {dataStored});
+
+      storage.save({
+        // dynamic key
+        key: dataStored.licNum, // Note: Do not use underscore("_") in key!
+        data: dataStored,
+
+        // if expires not specified, the defaultExpires will be applied instead.
+        // if set to null, then it will never expire.
+        expires: 1000 * 3600
+			});
 
 
-								//Append the input data to the file
-								RNFetchBlob.fs.writeStream(path, 'base64', true)
-								.then((stream) => {
-									stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
-									return stream.close()
-								})
-								var today = new Date();
-					    	var birthDate = new Date(this.state.dob);
-						    var age = today.getFullYear() - birthDate.getFullYear();
-						    var m = today.getMonth() - birthDate.getMonth();
-						    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
-								{
-						        age--;
-						    }
-								if(age >= 21)
-					      {
-									showMessage({
-			              message: "21+ Guest Added to Event!",
-			              type: "info",
-										duration: 3000,
-										backgroundColor: "green",
-			            });
-		            //alert('21+ guest added to event!')
-							}else{
-								showMessage({
-		              message: "Under 21 Guest Added to the Event!",
-		              type: "info",
-									duration: 3000,
-									backgroundColor: "blue",
-		            });
-								//alert('under 21 guest added to the event!')
-							}
-		            this.socket.emit('onPressEnterData', {csvData});
-							}
+			var today = new Date();
+			var birthDate = new Date(this.state.dob);
+			var age = today.getFullYear() - birthDate.getFullYear();
+			var m = today.getMonth() - birthDate.getMonth();
+			if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+			{
+					age--;
+			}
+			if(age >= 21)
+			{
+				showMessage({
+					message: "21+ Guest Added to Event!",
+					type: "info",
+					duration: 3000,
+					backgroundColor: "green",
+				});
+			}else{
+				showMessage({
+					message: "Under 21 Guest Added to the Event!",
+					type: "info",
+					duration: 3000,
+					backgroundColor: "blue",
+				});
+			}
 
-						})
+			break;
+      case 'ExpiredError':
+        // TODO
+        break;
+    }
+  });
 
-			})
       // Resets the input boxes to empty after the submission
       // Taken out right now for test demonstration
 		/*	this.setState({licNum: "",
