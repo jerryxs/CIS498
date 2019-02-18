@@ -118,7 +118,6 @@ export default class App extends Component<Props> {
 	//Function for submit button
     onPressEnterData(){
 		//When submit is pressed, an array is populated with the new state of each input box
-
 		const dataStored = {
 			licNum: this.state.licNum,
 			dob: this.state.dob,
@@ -141,9 +140,7 @@ export default class App extends Component<Props> {
 			dataStored.address = hash
 			console.warn(dataStored.address);
 		})
-		sleep ( 1);
 
-		console.warn(dataStored.licNum);
 		console.warn('dup check: ', dataStored.licNum);
 		storage.load({
 
