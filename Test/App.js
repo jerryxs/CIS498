@@ -8,6 +8,7 @@ import {
 	AsyncStorage,
 	Text,
 	ScrollView,
+	InteractionManager,
   View,
   PermissionsAndroid
 	} from 'react-native';
@@ -17,9 +18,11 @@ import FlashMessage, {showMessage, hideMessage} from "react-native-flash-message
 import Storage from 'react-native-storage';
 //import DeviceInfo from 'react-native-device-info';
 
+console.disableYellowBox = true;
+
 const storage = new Storage({
   // maximum capacity, default 1000
-  size: 5000,
+  size: 500000,
 
   // Use AsyncStorage for RN apps, or window.localStorage for web apps.
   // If storageBackend is not set, data will be lost after reload.
@@ -47,7 +50,7 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props);
 
-        this.socket = io('http://172.18.18.177:8000'); // connects to the local server
+        this.socket = io('http://172.18.15.245:8000'); // connects to the local server
         // Use this area to listen to signals from server and do something...
         this.socket.on('receiveUserData', (data) => {
 
@@ -79,87 +82,110 @@ export default class App extends Component<Props> {
     }
 
 		onPressTest(){
-      console.warn("jo");
 			//Need to set up new test... will only be size of max set above
-      var lic = 1000;
-			for(var num = 1; num < 5000; num++){
 
-        const dataTest = {
-          licNum: lic,
-          dob: "6/10/97",
-          fName: "Jake",
-          lName: "Meloche",
-          address: "285 Old Westport Rd",
-          town: "Dartmouth",
-          st8: "MA",
-          gndr: "M"
-        };
+			var num = 1;
+			var temp = 10000000;
+			var start = new Date();
 
-        storage.save({
-          // dynamic key
-          key: dataTest.licNum, // Note: Do not use underscore("_") in key!
-          data: dataTest,
-        
-          // if expires not specified, the defaultExpires will be applied instead.
-          // if set to null, then it will never expire.
-          expires: 1000 * 3600
-        });
 
-      
-        console.log(storage);
-        lic++;
-        //this.socket.emit('onPressTest', {dataStored});
+			
+			for(num; num < 100000; num++){
+				console.log('starting...');
+				var testData = {
+					licNum: temp,
+					dob: "10/25/1996",
+					fName: "Tester",
+					lName: "Smith",
+					address: "123 Street St",
+					town: "Testville",
+					st8: "MA",
+					gndr: "?"
+				};
+				storage.save({
+					// dynamic key
+					key: testData.licNum, // Note: Do not use underscore("_") in key!
+					data: testData,
+				
+					// if expires not specified, the defaultExpires will be applied instead.
+					// if set to null, then it will never expire.
+					expires: 1000 * 3600
+				});
 
-			 /*sha256(csvData[0]).then( hash => {
-			 csvData[0] = hash
-			 RNFetchBlob.fs.appendFile(path, RNFetchBlob.base64.encode(csvData + '\n'), 'base64')
-						 .then(()=>{ return;})
-			 })*/
-
+				temp = temp + 1;
+				
+			 
 			}
-      console.warn("done");
-      console.log(storage);
+
+			var finish = new Date();
+			//var difference = new Date();
+			//difference.setTime(finish.getTime() - start.getTime());
+			//alert( difference.getMilliseconds() + 'ms' );
+			var difference = finish.getTime() - start.getTime();
+			alert(difference + 'ms');
+
 		}
+
+		 
+
 
 	//Function for submit button
     onPressEnterData(){
-	  //When submit is pressed, an array is populated with the new state of each input box
-		
-		// Needs tested...
-		/*sha256(this.state.licNum).then( hash => {
-			this.state.licNum = hash
-    })
-    console.warn(this.state.licNum);
-		sha256(this.state.address).then( hash => {
-			this.state.address = hash
-      console.warn(this.state.address);
-		})*/
 
-		storage.load({
-    // same dynamic key
-    key: this.state.licNum,
-  
-    // autoSync (default: true) means if data is not found or has expired,
-    // then invoke the corresponding sync method
-    autoSync: true,
-  
-    // syncInBackground (default: true) means if data expired,
-    // return the outdated data first while invoking the sync method.
-    // If syncInBackground is set to false, and there is expired data,
-    // it will wait for the new data and return only after the sync completed.
-    // (This, of course, is slower)
-    syncInBackground: true,
-  
-    // you can pass extra params to the sync method
-    syncParams: {
-      extraFetchOptions: {
-				// none
-      },
-      someFlag: true
-    }
-  })
-  
-  .then(ret => {
+
+			
+		//When submit is pressed, an array is populated with the new state of each input box
+		
+		const dataStored = {
+			licNum: this.state.licNum,
+			dob: this.state.dob,
+			fName: this.state.fName,
+			lName: this.state.lName,
+			address: this.state.address,
+			town: this.state.town,
+			st8: this.state.st8,
+			gndr: this.state.gndr
+		};
+
+		
+		sha256(dataStored.licNum).then( hash => {
+			dataStored.licNum = hash
+console.warn(dataStored.licNum); 
+return dataStored
+	}).then(dataStored => {
+sha256(dataStored.address).then( hash => {
+	dataStored.address = hash
+	console.warn(dataStored.address); 
+})
+return dataStored
+}).then(dataStored => {
+console.warn(dataStored.licNum);
+
+return storage.load({
+// same dynamic key
+key: dataStored.licNum,
+
+// autoSync (default: true) means if data is not found or has expired,
+// then invoke the corresponding sync method
+autoSync: true,
+
+// syncInBackground (default: true) means if data expired,
+// return the outdated data first while invoking the sync method.
+// If syncInBackground is set to false, and there is expired data,
+// it will wait for the new data and return only after the sync completed.
+// (This, of course, is slower)
+syncInBackground: true,
+
+// you can pass extra params to the sync method
+syncParams: {
+	extraFetchOptions: {
+		// none
+	},
+	someFlag: true 
+}
+
+});})
+.then(ret => {
     // found data go to then()
     showMessage({
 			message: "Duplicate Warning!",
@@ -172,26 +198,17 @@ export default class App extends Component<Props> {
   .catch(err => {
     // any exception including data not found
     // goes to catch()
-    // console.warn(err.message);
+    //console.warn(err.message);
     switch (err.name) {
 			case 'NotFoundError':
 
-      const dataStored = {
-        licNum: this.state.licNum,
-				dob: this.state.dob,
-				fName: this.state.fName,
-				lName: this.state.lName,
-				address: this.state.address,
-				town: this.state.town,
-				st8: this.state.st8,
-				gndr: this.state.gndr
-			};
+			console.warn('Saved data: ', dataStored.licNum);
 			
       this.socket.emit('onPressEnterData', {dataStored});
 			
       storage.save({
         // dynamic key
-        key: this.state.licNum, // Note: Do not use underscore("_") in key!
+        key: dataStored.licNum, // Note: Do not use underscore("_") in key!
         data: dataStored,
       
         // if expires not specified, the defaultExpires will be applied instead.
@@ -222,8 +239,7 @@ export default class App extends Component<Props> {
 					type: "info",
 					duration: 3000,
 					backgroundColor: "blue",
-        });
-        console.warn(storage);
+				});
 			}
 			
 			break;
@@ -243,9 +259,8 @@ export default class App extends Component<Props> {
 										town: "",
 										st8: "",
 										gndr: ""
-							        })*/
-
-    }
+											})*/
+	}
 
     render() {
         return (
