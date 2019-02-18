@@ -3,58 +3,69 @@ import {
 	AppRegistry,
 	Button,
 	TextInput,
+	Platform,
 	StyleSheet,
+	AsyncStorage,
 	Text,
 	ScrollView,
-  View	} from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
+  View,
+  PermissionsAndroid
+	} from 'react-native';
 import { sha256 } from 'react-native-sha256';
-import {createStackNavigator, StackActions, NavigationActions} from 'react-navigation';
-import {
-  initialize,
-  isSuccessfulInitialize,
-  startDiscoveringPeers,
-  stopDiscoveringPeers,
-  unsubscribeFromPeersUpdates,
-  unsubscribeFromConnectionInfoUpdates,
-  subscribeOnConnectionInfoUpdates,
-  subscribeOnPeersUpdates,
-  connect,
-  disconnect,
-  createGroup,
-  removeGroup,
-  getAvailablePeers,
-  getConnectionInfo,
-  receiveMessage,
-  sendMessage
-} from 'react-native-wifi-p2p';
-import DeviceInfo from 'react-native-device-info';
+import io from 'socket.io-client/dist/socket.io';
+import FlashMessage, {showMessage, hideMessage} from "react-native-flash-message";
+import Storage from 'react-native-storage';
+//import DeviceInfo from 'react-native-device-info';
 
+const storage = new Storage({
+  // maximum capacity, default 1000
+  size: 5000,
 
-const dirs = RNFetchBlob.fs.dirs
-var path = dirs.DocumentDir + '/my.csv';
-	/*
-	 * Check to see if the CSV file exists
-	 * If it does then skip this portion as to not add the headers again
-	 * If not then create this file at the file path for android and add headers
-	 */
-	 RNFetchBlob.fs.exists(path)
-.then((exist) => {
-    if(exist === false){
-			RNFetchBlob.fs.writeStream(path, 'base64', true)
-		     .then((stream) => {
-		         stream.write(RNFetchBlob.base64.encode('licNum, DOB, fName, lName, address, town, state, gender ' + '\n'))
-		         return stream.close()
-		     })
-		}
-})
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {
+    
+  }
+});
 
 type Props = {};
-class App extends Component<Props> {
+export default class App extends Component<Props> {
 
 	//Add states for input boxes
     constructor(props) {
         super(props);
+
+        this.socket = io('http://172.18.18.177:8000'); // connects to the local server
+        // Use this area to listen to signals from server and do something...
+        this.socket.on('receiveUserData', (data) => {
+
+					console.warn('Got it!', data.data.dataStored);
+					storage.save({
+						// dynamic key
+						key: data.data.dataStored.licNum, // Note: Do not use underscore("_") in key!
+						data: data.data.dataStored,
+					
+						// if expires not specified, the defaultExpires will be applied instead.
+						// if set to null, then it will never expire.
+						expires: 1000 * 3600
+					});
+
+            alert('Guest Added To The Event List!')
+
+				});
+				
         this.state = {
 			licNum: "",
 			dob: "",
@@ -66,115 +77,165 @@ class App extends Component<Props> {
 			gndr: ""
         };
     }
-    onPressInfo(){
-      const name = DeviceInfo.getDeviceName();
-      alert(name);
-    }
+
 		onPressTest(){
-			var num = 1;
-			var csvData = [];
-			for(num; num < 5000; num++){
+      console.warn("jo");
+			//Need to set up new test... will only be size of max set above
+      var lic = 1000;
+			for(var num = 1; num < 5000; num++){
 
-				csvData = [
-				10000000,
-				"12/4/95",
-				"Nick",
-				"Corcoran",
-				"123 test st",
-				"testville",
-				"Testachusetts",
-				"t"
+        const dataTest = {
+          licNum: lic,
+          dob: "6/10/97",
+          fName: "Jake",
+          lName: "Meloche",
+          address: "285 Old Westport Rd",
+          town: "Dartmouth",
+          st8: "MA",
+          gndr: "M"
+        };
 
-			 ];
-			 csvData[0] = 10000000;
-			 csvData[0] = csvData[0] + num;
-			 csvData[0] = "S" + csvData[0];
+        storage.save({
+          // dynamic key
+          key: dataTest.licNum, // Note: Do not use underscore("_") in key!
+          data: dataTest,
+        
+          // if expires not specified, the defaultExpires will be applied instead.
+          // if set to null, then it will never expire.
+          expires: 1000 * 3600
+        });
 
-			 sha256(csvData[0]).then( hash => {
+      
+        console.log(storage);
+        lic++;
+        //this.socket.emit('onPressTest', {dataStored});
+
+			 /*sha256(csvData[0]).then( hash => {
 			 csvData[0] = hash
 			 RNFetchBlob.fs.appendFile(path, RNFetchBlob.base64.encode(csvData + '\n'), 'base64')
 						 .then(()=>{ return;})
-			 })
+			 })*/
 
-				csvData[0] = 10000000;
 			}
-			console.warn("done");
-		}
-		getDate()
-		{
-			var today = new Date();
-    	var birthDate = new Date(this.state.dob);
-	    var age = today.getFullYear() - birthDate.getFullYear();
-	    var m = today.getMonth() - birthDate.getMonth();
-	    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
-			{
-	        age--;
-	    }
-			if(age >= 21)
-      {
-        alert("Guest Is 21+")
-      }
+      console.warn("done");
+      console.log(storage);
 		}
 
 	//Function for submit button
     onPressEnterData(){
 	  //When submit is pressed, an array is populated with the new state of each input box
-	  var csvData = [
+		
+		// Needs tested...
+		/*sha256(this.state.licNum).then( hash => {
+			this.state.licNum = hash
+    })
+    console.warn(this.state.licNum);
+		sha256(this.state.address).then( hash => {
+			this.state.address = hash
+      console.warn(this.state.address);
+		})*/
 
-		 this.state.licNum,
-		 this.state.dob,
-		 this.state.fName,
-		 this.state.lName,
-		 this.state.address,
-		 this.state.town,
-		 this.state.st8,
-		 this.state.gndr
+		storage.load({
+    // same dynamic key
+    key: this.state.licNum,
+  
+    // autoSync (default: true) means if data is not found or has expired,
+    // then invoke the corresponding sync method
+    autoSync: true,
+  
+    // syncInBackground (default: true) means if data expired,
+    // return the outdated data first while invoking the sync method.
+    // If syncInBackground is set to false, and there is expired data,
+    // it will wait for the new data and return only after the sync completed.
+    // (This, of course, is slower)
+    syncInBackground: true,
+  
+    // you can pass extra params to the sync method
+    syncParams: {
+      extraFetchOptions: {
+				// none
+      },
+      someFlag: true
+    }
+  })
+  
+  .then(ret => {
+    // found data go to then()
+    showMessage({
+			message: "Duplicate Warning!",
+			description: "Guest Has Already Entered The Event",
+			duration: 3000,
+			type: "info",
+			backgroundColor: "red",
+		});
+  })
+  .catch(err => {
+    // any exception including data not found
+    // goes to catch()
+    // console.warn(err.message);
+    switch (err.name) {
+			case 'NotFoundError':
 
-	  ];
+      const dataStored = {
+        licNum: this.state.licNum,
+				dob: this.state.dob,
+				fName: this.state.fName,
+				lName: this.state.lName,
+				address: this.state.address,
+				town: this.state.town,
+				st8: this.state.st8,
+				gndr: this.state.gndr
+			};
+			
+      this.socket.emit('onPressEnterData', {dataStored});
+			
+      storage.save({
+        // dynamic key
+        key: this.state.licNum, // Note: Do not use underscore("_") in key!
+        data: dataStored,
+      
+        // if expires not specified, the defaultExpires will be applied instead.
+        // if set to null, then it will never expire.
+        expires: 1000 * 3600
+			});
+			
+			
+			var today = new Date();
+			var birthDate = new Date(this.state.dob);
+			var age = today.getFullYear() - birthDate.getFullYear();
+			var m = today.getMonth() - birthDate.getMonth();
+			if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+			{
+					age--;
+			}
+			if(age >= 21)
+			{
+				showMessage({
+					message: "21+ Guest Added to Event!",
+					type: "info",
+					duration: 3000,
+					backgroundColor: "green",
+				});
+			}else{
+				showMessage({
+					message: "Under 21 Guest Added to the Event!",
+					type: "info",
+					duration: 3000,
+					backgroundColor: "blue",
+        });
+        console.warn(storage);
+			}
+			
+			break;
+      case 'ExpiredError':
+        // TODO
+        break;
+    }
+  });
 
-		sha256(csvData[0]).then( hash => {
-			csvData[0] = hash
-    //console.warn(csvData[0]);
-		})
-		sha256(csvData[4]).then( hash => {
-			csvData[4] = hash
-    //console.warn(csvData[4]);
-		})
-
-	  //console.warn("Directory: ", dirs.DocumentDir);
-	  //Array is indexed properly can store csvData[0] into string to dup check
-	  //console.warn("Array[0]: ", csvData[0]);
-		  //Read file before adding new info to it
-		  //Currently just reads the file and spits out the info in a warn
-		  RNFetchBlob.fs.readStream(path, 'utf8')
-			.then((stream) => {
-				let data = ''
-				stream.open()
-				stream.onData((chunk) => {
-					data += chunk
-
-				})
-
-				stream.onEnd(() => {
-					if(data.includes(csvData[0])){
-						alert('Duplicate Warning!' + '\n' + 'Guest Has Already Entered The Event')
-						//console.warn(csvData[0], " Is already in the file");
-					}
-					else{
-
-						//Append the input data to the file
-						RNFetchBlob.fs.writeStream(path, 'base64', true)
-						.then((stream) => {
-							stream.write(RNFetchBlob.base64.encode(csvData + '\n'))
-							return stream.close()
-						})
-						alert('Guest Added To The Event List!')
-					}
-
-				})
-			})
       // Resets the input boxes to empty after the submission
-			this.setState({licNum: "",
+      // Taken out right now for test demonstration
+		/*	this.setState({licNum: "",
 										dob: "",
 										fName: "",
 										lName: "",
@@ -182,7 +243,7 @@ class App extends Component<Props> {
 										town: "",
 										st8: "",
 										gndr: ""
-							        })
+							        })*/
 
     }
 
@@ -197,13 +258,16 @@ class App extends Component<Props> {
                 <Text style={styles.welcome}>EManage</Text>
                 <Text style={styles.instructions}>Please Enter the Following Data</Text>
 
+
+
+
                 <TextInput
                 style={{height: 40, width: 100, margin: 10, borderColor: 'gray', borderWidth: 2}}
                 style={{height: 40, width: "59%", borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
                 onChangeText={(licNum) => this.setState({licNum})}
                 value={this.state.licNum}
                 placeholder = "License Number"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -212,7 +276,7 @@ class App extends Component<Props> {
                 onChangeText={(dob) => this.setState({dob})}
                 value={this.state.dob}
                 placeholder = "MM/DD/YYYY"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -221,7 +285,7 @@ class App extends Component<Props> {
                 onChangeText={(fName) => this.setState({fName})}
                 value={this.state.fName}
                 placeholder = "First Name"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -230,7 +294,7 @@ class App extends Component<Props> {
                 onChangeText={(lName) => this.setState({lName})}
                 value={this.state.lName}
                 placeholder = "Last Name"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -239,7 +303,7 @@ class App extends Component<Props> {
                 onChangeText={(address) => this.setState({address})}
                 value={this.state.address}
                 placeholder = "Address"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -248,7 +312,7 @@ class App extends Component<Props> {
                 onChangeText={(town) => this.setState({town})}
                 value={this.state.town}
                 placeholder = "Town"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -257,7 +321,7 @@ class App extends Component<Props> {
                 onChangeText={(st8) => this.setState({st8})}
                 value={this.state.st8}
                 placeholder = "State"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
 
                 <TextInput
@@ -266,25 +330,8 @@ class App extends Component<Props> {
                 onChangeText={(gndr) => this.setState({gndr})}
                 value={this.state.gndr}
                 placeholder = "Gender"
-								placeholderTextColor = "gray"
+								placeholderTextColor = "black"
                 />
-                
-
-
-
-
-                <View style = {styles.container}>
-                  <TextInput style = {styles.textInput} autoCapitalize = 'none'
-                  onChangeText = {this.setName}/>
-                  <Text>
-                   {this.state.name}
-                  </Text>
-                </View>
-
-
-
-
-
 								<View style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}>
                 <Button  onPress ={this.onPressEnterData.bind(this)}
             			title="Submit"
@@ -294,202 +341,16 @@ class App extends Component<Props> {
             			title="Test"
             			color='purple'
             		/>
-								<Button  onPress ={this.getDate.bind(this)}
-            			title="Get Date"
-            			color='purple'
-            		/>
-                <Button  onPress ={this.onPressInfo.bind(this)}
-            			title="Device Info"
-            			color='purple'
-            		/>
-                <Button
-                       title="Nodes"
-                       onPress = {() => {
-                       this.props.navigation.dispatch(StackActions.reset({
-                             index: 0,
-                             actions: [
-                                       NavigationActions.navigate({ routeName: 'DistributedList'})
-                                       ],
-                             }))
-                       }}
-                       color='purple'
-                       />
+
 								</View>
 
 
 								</View>
+								<FlashMessage position="top"/>
                 </ScrollView>
                 );
     }
 }
-
-// --------------------------------------------------------------------------------------------------------------------------
-// DistributedList Proof of Concept
-
-type Props = {};
-class Dlist extends Component<Props> {
-	constructor(props){
-	super(props);
-  this.state = {
-    devices: []
-  };
-}
-
-  componentDidMount() {
-    initialize();
-    isSuccessfulInitialize()
-        .then(status => console.warn(status));
-    startDiscoveringPeers()
-        .then(() => console.warn('Sucessfull'))
-        .catch(err => console.warn(err));
-
-    subscribeOnPeersUpdates(({ devices }) => this.handleNewPeers(devices));
-    subscribeOnConnectionInfoUpdates(this.handleNewInfo);
-  }
-
-  componentWillUnmount() {
-    unsubscribeFromConnectionInfoUpdates((event) => console.log('unsubscribeFromConnectionInfoUpdates', event));
-    unsubscribeFromPeersUpdates((event) => console.log('unsubscribeFromPeersUpdates', event));
-  }
-
-  handleNewInfo = (info) => {
-    console.warn(64646776467, info);
-  };
-
-  handleNewPeers = (peers) => {
-    console.log(754862162442324, peers);
-    this.setState({ devices: peers });
-  };
-
-  connectToFirstDevice = () => {
-      console.warn(this.state.devices[0]);
-      connect('ce:c0:79:87:1b:86')
-          .then(() => console.warn('Successfully connected'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  disconnectFromDevice = () => {
-      disconnect()
-          .then(() => console.log(2423435423, 'Successfully disconnected'))
-          .catch(err => console.error(2423435423, 'Something gone wrong. Details: ', err));
-  };
-
-  onCreateGroup = () => {
-      createGroup()
-          .then(() => console.warn('Group created successfully!'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  onRemoveGroup = () => {
-      removeGroup()
-          .then(() => console.warn('Currently you don\'t belong to group!'))
-          .catch(err => console.error('Something gone wrong. Details: ', err));
-  };
-
-  onStopInvestigation = () => {
-      stopDiscoveringPeers()
-          .then(() => console.warn('Stopping of discovering was successful'))
-          .catch(err => console.error(`Something is gone wrong. Maybe your WiFi is disabled? Error details`, err));
-  };
-
-  onStartInvestigate = () => {
-      startDiscoveringPeers()
-          .then(status => console.warn(33333333, `Status of discovering peers: ${status}`))
-          .catch(err => console.error(`Something is gone wrong. Maybe your WiFi is disabled? Error details: ${err}`));
-  };
-
-  onGetAvailableDevices = () => {
-      getAvailablePeers()
-          .then(peers => console.warn(peers));
-  };
-
-  onSendMessage = () => {
-      sendMessage("Hello world!")
-        .then(() => console.warn('Message sent successfully'))
-        .catch(err => console.log('Error while message sending', err));
-  };
-
-  onReceiveMessage = () => {
-      receiveMessage()
-          .then((msg) => alert('Message received successfully ' +  msg))
-          .catch(err => console.warn('Error while message receiving', err))
-  };
-
-  onGetConnectionInfo = () => {
-    getConnectionInfo()
-        .then(info => console.warn(info));
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <Button
-          title="Connect"
-          onPress={this.connectToFirstDevice}
-        />
-        <Button
-          title="Disconnect"
-          onPress={this.disconnectFromDevice}
-        />
-        <Button
-          title="Create group"
-          onPress={this.onCreateGroup}
-        />
-        <Button
-          title="Remove group"
-          onPress={this.onRemoveGroup}
-        />
-        <Button
-          title="Investigate"
-          onPress={this.onStartInvestigate}
-        />
-        <Button
-          title="Prevent Investigation"
-          onPress={this.onStopInvestigation}
-        />
-        <Button
-          title="Get Available Devices"
-          onPress={this.onGetAvailableDevices}
-        />
-        <Button
-          title="Get connection Info"
-          onPress={this.onGetConnectionInfo}
-        />
-        <Button
-          title="Send message"
-          onPress={this.onSendMessage}
-        />
-        <Button
-          title="Receive message"
-          onPress={this.onReceiveMessage}
-        />
-
-        <Button
-               title="Return"
-               onPress = {() => {
-               this.props.navigation.dispatch(StackActions.reset({
-                     index: 0,
-                     actions: [
-                               NavigationActions.navigate({ routeName: 'UserInput'})
-                               ],
-                     }))
-               }}
-               color='steelblue'
-               />
-      </View>
-    );
-  }
-}
-
-export default createStackNavigator({
-            DistributedList: {
-            screen: Dlist,
-            },
-            UserInput: {
-            screen: App,
-            },
-        }, { initialRouteName: 'UserInput',
-    });
 
 const styles = StyleSheet.create({
   container: {
