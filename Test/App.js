@@ -250,23 +250,8 @@ export default class App extends Component<Props> {
   render() {
     return (
       <ScrollView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            margin: 10,
-            alignItems: "center"
-          }}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "powderblue",
-              margin: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          />
+        <View style={styles.container}>
+          <View style={styles.container} />
           <View style={{ flex: 1, backgroundColor: "skyblue" }} />
 
           <View style={{ flex: 1, backgroundColor: "steelblue" }} />
@@ -276,20 +261,7 @@ export default class App extends Component<Props> {
           </Text>
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={licNum => this.setState({ licNum })}
             value={this.state.licNum}
             placeholder="License Number"
@@ -297,24 +269,11 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.dateInput.focus();
             }}
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={dob => this.setState({ dob })}
             value={this.state.dob}
             returnKeyType="next"
@@ -323,24 +282,11 @@ export default class App extends Component<Props> {
               this.firstNameInput.focus();
             }}
             placeholder="MM/DD/YYYY"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={fName => this.setState({ fName })}
             value={this.state.fName}
             returnKeyType="next"
@@ -349,24 +295,11 @@ export default class App extends Component<Props> {
               this.lastNameInput.focus();
             }}
             placeholder="First Name"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={lName => this.setState({ lName })}
             value={this.state.lName}
             returnKeyType="next"
@@ -375,24 +308,11 @@ export default class App extends Component<Props> {
               this.addressInput.focus();
             }}
             placeholder="Last Name"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={address => this.setState({ address })}
             value={this.state.address}
             returnKeyType="next"
@@ -401,24 +321,11 @@ export default class App extends Component<Props> {
               this.townInput.focus();
             }}
             placeholder="Address"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={town => this.setState({ town })}
             value={this.state.town}
             returnKeyType="next"
@@ -427,24 +334,11 @@ export default class App extends Component<Props> {
               this.st8Input.focus();
             }}
             placeholder="Town"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 50,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={st8 => this.setState({ st8 })}
             value={this.state.st8}
             returnKeyType="next"
@@ -453,30 +347,17 @@ export default class App extends Component<Props> {
               this.genderInput.focus();
             }}
             placeholder="State"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
 
           <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+            style={styles.textBox}
             onChangeText={gndr => this.setState({ gndr })}
             value={this.state.gndr}
             returnKeyType="go"
             ref={input => (this.genderInput = input)}
             placeholder="Gender"
-            placeholderTextColor="black"
+            placeholderTextColor="gray"
           />
           <View
             style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}
@@ -502,12 +383,13 @@ export default class App extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin: 10,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
+    alignItems: "center"
   },
   welcome: {
     fontSize: 20,
+    color: "black",
     textAlign: "center",
     margin: 10
   },
@@ -515,6 +397,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 5
+  },
+  textBox: {
+    height: 40,
+    width: "59%",
+    borderColor: "gray",
+    borderWidth: 2,
+    textAlign: "center"
   }
 });
 //needed since we are not using create-react-native-app
