@@ -1,17 +1,9 @@
 <script src="/socket.io/socket.io.js"></script>
 
-<input type="file" id="fileLoader" name="files" title="Load File" />
-<!--<input type="button" id="btnOpenFileDialog" onclick="openfileDialog();" /> -->
-<!--<button> Update </button>
-<script>
-    var socket = io();
-    var button = document.querySelector('button');
-    button.onclick = () => {
-        socket.emit('update');
-    }
-</script> -->
-<script>
-  function openfileDialog() {
-    $("#fileLoader").click();
-  }
-</script>
+<html>
+  <body>
+        <form method='post' action='upload' enctype="multipart/form-data">
+            <input type='file' name='fileUploaded'>
+            <input type='submit'>
+  </body>
+</html>
