@@ -50,7 +50,7 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.socket = io("http://172.18.15.245:8000"); // connects to the local server
+    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
     // Use this area to listen to signals from server and do something...
     this.socket.on("receiveUserData", data => {
       storage.save({
@@ -227,6 +227,17 @@ export default class App extends Component<Props> {
               });
             }
 
+            this.setState({
+              licNum: "",
+              dob: "",
+              fName: "",
+              lName: "",
+              address: "",
+              town: "",
+              st8: "",
+              gndr: ""
+            });
+
             break;
           case "ExpiredError":
             // TODO
@@ -236,15 +247,16 @@ export default class App extends Component<Props> {
 
     // Resets the input boxes to empty after the submission
     // Taken out right now for test demonstration
-    /*	this.setState({licNum: "",
-										dob: "",
-										fName: "",
-										lName: "",
-										address: "",
-										town: "",
-										st8: "",
-										gndr: ""
-											})*/
+    /*this.setState({
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    });*/
   }
 
   render() {
@@ -484,11 +496,6 @@ export default class App extends Component<Props> {
             <Button
               onPress={this.onPressEnterData.bind(this)}
               title="Submit"
-              color="purple"
-            />
-            <Button
-              onPress={this.onPressTest.bind(this)}
-              title="Test"
               color="purple"
             />
           </View>

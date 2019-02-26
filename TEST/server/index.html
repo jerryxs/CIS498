@@ -1,6 +1,7 @@
-<h1> Hey </h1>
-<script src = "/socket.io/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
+<input type="file" id="fileLoader" name="files" title="Load File" />
+<!--<input type="button" id="btnOpenFileDialog" onclick="openfileDialog();" /> -->
 <!--<button> Update </button>
 <script>
     var socket = io();
@@ -9,3 +10,8 @@
         socket.emit('update');
     }
 </script> -->
+<script>
+  function openfileDialog() {
+    $("#fileLoader").click();
+  }
+</script>
