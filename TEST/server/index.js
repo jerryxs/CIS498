@@ -7,6 +7,7 @@ var fs = require("fs");
 var path = require("path");
 let csvToJson = require("convert-csv-to-json");
 var arr = [];
+var jsonObj = [];
 
 server.listen(8000);
 
@@ -48,13 +49,14 @@ app.route("/upload").post(function(req, res, next) {
     for (var i = 1; i < arr.length; i++) {
       var data = arr[i].split(",");
       var obj = {};
-      /*for (var j = 0; j < data.length; j++) {
+      var headers = arr[0].split(",");
+      for (var j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
-      }*/
-      //jsonObj.push(obj);
+      }
+      jsonObj.push(obj);
     }
-    //JSON.stringify(jsonObj);
-    //console.log(jsonObj);
+    JSON.stringify(jsonObj);
+    console.log(jsonObj);
 
     //JSON.parse(arr);
     //res.send(arr);
