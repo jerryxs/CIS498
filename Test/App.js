@@ -51,6 +51,10 @@ export default class App extends Component<Props> {
     super(props);
 
     this.socket = io("http://134.88.141.18:8000"); // connects to the local server
+    this.socket.on("gotBannedList", listData => {
+      console.warn(listData.bannedList);
+      //console.log("test");
+    });
     // Use this area to listen to signals from server and do something...
     this.socket.on("receiveUserData", data => {
       storage.save({
