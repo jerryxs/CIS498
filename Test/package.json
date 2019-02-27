@@ -8,7 +8,9 @@
     "server": "nodemon server"
   },
   "dependencies": {
+    "busboy": "^0.3.0",
     "connect-busboy": "0.0.2",
+    "convert-csv-to-json": "0.0.13",
     "express": "^4.16.4",
     "express-fileupload": "^1.1.1-alpha.3",
     "nodemon": "^1.18.9",

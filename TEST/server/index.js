@@ -5,6 +5,8 @@ var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
 var fs = require("fs");
 var path = require("path");
+let csvToJson = require("convert-csv-to-json");
+var arr = [];
 
 server.listen(8000);
 
@@ -27,8 +29,35 @@ app.route("/upload").post(function(req, res, next) {
     file.pipe(fstream);
     fstream.on("close", function() {
       console.log("Upload Finished of " + filename);
+
       res.redirect("back"); //where to go next
     });
+  });
+  fs.readFile("servertest.csv", (err, data) => {
+    if (err) {
+      return console.log(err);
+    }
+
+    //Convert and store csv information into a buffer.
+    bufferString = data.toString();
+
+    //Store information for each individual person in an array index. Split it by every newline in the csv file.
+    arr = bufferString.split("\n");
+    console.log(arr);
+
+    for (var i = 1; i < arr.length; i++) {
+      var data = arr[i].split(",");
+      var obj = {};
+      /*for (var j = 0; j < data.length; j++) {
+        obj[headers[j].trim()] = data[j].trim();
+      }*/
+      //jsonObj.push(obj);
+    }
+    //JSON.stringify(jsonObj);
+    //console.log(jsonObj);
+
+    //JSON.parse(arr);
+    //res.send(arr);
   });
 });
 
