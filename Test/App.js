@@ -50,7 +50,10 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.socket = io("http://134.88.141.18:8000"); // connects to the local server
+    this.socket = io("http://172.18.11.158:8000"); // connects to the local server
+    /*this.socket.on("buttonPress", () => {
+      console.warn("from web page");
+    });*/
     this.socket.on("gotBannedList", listData => {
       console.warn(listData.bannedList);
       //console.log("test");
