@@ -44,20 +44,56 @@ const storage = new Storage({
   sync: {}
 });
 
+const bannedListStorage = new Storage({
+  // maximum capacity, default 1000
+  size: 100000,
+
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {}
+});
+
 type Props = {};
 export default class App extends Component<Props> {
   //Add states for input boxes
   constructor(props) {
     super(props);
 
-    this.socket = io("http://172.18.11.158:8000"); // connects to the local server
+    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
     this.socket.on("gotBannedList", listData => {
-      console.warn(listData.bannedList);
-      //console.log("test");
+      var bannedList = listData.bannedList;
+      console.warn(bannedList.length);
+
+      /*for (var i = 0; i < bannedList.length; i++) {
+        console.warn(bannedList[i]);
+      }*/
+
+      bannedList.forEach(bannedGuest => {
+        console.warn(bannedGuest);
+        bannedListStorage.save({
+          key: bannedGuest.licNum,
+          data: bannedGuest,
+
+          expires: 1000 * 3600
+        });
+      });
     });
+
     // Use this area to listen to signals from server and do something...
     this.socket.on("receiveUserData", data => {
       storage.save({
@@ -87,8 +123,7 @@ export default class App extends Component<Props> {
 
   onPressTest() {
     //Need to set up new test... will only be size of max set above
-
-    var num = 1;
+    /*var num = 1;
     var temp = 10000000;
     console.log("starting...");
     var start = new Date();
@@ -129,7 +164,8 @@ export default class App extends Component<Props> {
           });
         temp = temp + 1;
       }
-    }, 1000);
+    }, 1000);*/
+    console.warn(bannedListStorage);
   }
   //Function for submit button
   onPressEnterData() {
@@ -386,6 +422,7 @@ export default class App extends Component<Props> {
               title="Submit"
               color="purple"
             />
+            <Button onPress={this.onPressTest} title="Test" color="purple" />
           </View>
         </View>
         <FlashMessage position="top" />
