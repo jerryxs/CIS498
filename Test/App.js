@@ -85,12 +85,26 @@ export default class App extends Component<Props> {
 
       bannedList.forEach(bannedGuest => {
         console.warn(bannedGuest);
-        bannedListStorage.save({
-          key: bannedGuest.licNum,
-          data: bannedGuest,
+        sha256(bannedGuest.licNum)
+          .then(hash => {
+            bannedGuest.licNum = hash;
 
-          expires: 1000 * 3600
-        });
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            sha256(bannedGuest.address).then(hash => {
+              bannedGuest.address = hash;
+            });
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            return bannedListStorage.save({
+              key: bannedGuest.licNum,
+              data: bannedGuest,
+
+              expires: 1000 * 3600
+            });
+          });
       });
     });
 
