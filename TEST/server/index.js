@@ -76,9 +76,12 @@ io.on("connection", function(socket) {
   // log the socket ID of the device
   console.log(socket.id);
 
+  // Function to check to see if the banned list is available
   function listNotEmpty() {
     if (bannedList.length !== 0) {
       socket.emit("gotBannedList", { bannedList });
+    } else {
+      socket.emit("noBannedList");
     }
   }
 
