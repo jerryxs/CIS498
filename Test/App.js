@@ -41,13 +41,7 @@ const storage = new Storage({
   // if data was not found in storage or expired data was found,
   // the corresponding sync method will be invoked returning
   // the latest data.
-<<<<<<< HEAD
-  sync: {
-
-  }
-=======
   sync: {}
->>>>>>> origin/newIanTest
 });
 
 type Props = {};
@@ -56,207 +50,17 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
-<<<<<<< HEAD
-	//Add states for input boxes
-    constructor(props) {
-        super(props);
-
-        this.socket = io('http://134.88.133.46:8000'); // connects to the local server
-        // Use this area to listen to signals from server and do something...
-        this.socket.on('receiveUserData', (data) => {
-
-					console.warn('Got it!', data.data.dataStored);
-					storage.save({
-						// dynamic key
-						key: data.data.dataStored.licNum, // Note: Do not use underscore("_") in key!
-						data: data.data.dataStored,
-
-						// if expires not specified, the defaultExpires will be applied instead.
-						// if set to null, then it will never expire.
-						expires: 1000 * 3600
-					});
-
-            alert('Guest Added To The Event List!')
-
-				});
-
-        this.state = {
-			licNum: "",
-			dob: "",
-			fName: "",
-			lName: "",
-			address: "",
-			town: "",
-			st8: "",
-			gndr: ""
-        };
-    }
-
-		onPressTest(){
-			/* Need to set up new test... will only be size of max set above
-			var num = 1;
-			var temp = 10000000;
-			var csvData = [];
-			for(num; num < 5000; num++){
-
-				csvData = [
-				10000000,
-				"12/4/95",
-				"Nick",
-				"Corcoran",
-				"123 test st",
-				"testville",
-				"Testachusetts",
-				"t"
-
-			 ];
-			 csvData[0] = 10000000;
-			 csvData[0] = csvData[0] + num;
-			 csvData[0] = "S" + csvData[0];
-
-			 sha256(csvData[0]).then( hash => {
-			 csvData[0] = hash
-			 RNFetchBlob.fs.appendFile(path, RNFetchBlob.base64.encode(csvData + '\n'), 'base64')
-						 .then(()=>{ return;})
-			 })
-
-				csvData[0] = 10000000;
-			}*/
-			console.warn("done");
-		}
-
-
-
-
-	//Function for submit button
-    onPressEnterData(){
-		//When submit is pressed, an array is populated with the new state of each input box
-		const dataStored = {
-			licNum: this.state.licNum,
-			dob: this.state.dob,
-			fName: this.state.fName,
-			lName: this.state.lName,
-			address: this.state.address,
-			town: this.state.town,
-			st8: this.state.st8,
-			gndr: this.state.gndr
-		};
-
-
-
-		sha256(dataStored.licNum).then( hash => {
-			dataStored.licNum = hash
-			console.warn(dataStored.licNum);
-		})
-
-		sha256(dataStored.address).then( hash => {
-			dataStored.address = hash
-			console.warn(dataStored.address);
-		})
-
-		console.warn('dup check: ', dataStored.licNum);
-		storage.load({
-
-    // same dynamic key
-    key: dataStored.licNum,
-
-    // autoSync (default: true) means if data is not found or has expired,
-    // then invoke the corresponding sync method
-    autoSync: true,
-
-    // syncInBackground (default: true) means if data expired,
-    // return the outdated data first while invoking the sync method.
-    // If syncInBackground is set to false, and there is expired data,
-    // it will wait for the new data and return only after the sync completed.
-    // (This, of course, is slower)
-    syncInBackground: true,
-
-    // you can pass extra params to the sync method
-    syncParams: {
-      extraFetchOptions: {
-				// none
-      },
-      someFlag: true
-    }
-  })
-  .then(ret => {
-    // found data go to then()
-    showMessage({
-			message: "Duplicate Warning!",
-			description: "Guest Has Already Entered The Event",
-			duration: 3000,
-			type: "info",
-			backgroundColor: "red",
-		});
-  })
-  .catch(err => {
-    // any exception including data not found
-    // goes to catch()
-    //console.warn(err.message);
-    switch (err.name) {
-			case 'NotFoundError':
-
-			console.warn('Saved data: ', dataStored.licNum);
-
-      this.socket.emit('onPressEnterData', {dataStored});
-			console.warn('Saved data: ', dataStored.licNum);
-      storage.save({
-        // dynamic key
-        key: dataStored.licNum, // Note: Do not use underscore("_") in key!
-        data: dataStored,
-=======
-    this.socket = io("http://172.18.15.245:8000"); // connects to the local server
+    this.socket = io("http://172.18.1.199:8000"); // connects to the local server
     // Use this area to listen to signals from server and do something...
     this.socket.on("receiveUserData", data => {
       storage.save({
         // dynamic key
         key: data.data.dataStored.licNum, // Note: Do not use underscore("_") in key!
         data: data.data.dataStored,
->>>>>>> origin/newIanTest
 
         // if expires not specified, the defaultExpires will be applied instead.
         // if set to null, then it will never expire.
         expires: 1000 * 3600
-<<<<<<< HEAD
-			});
-
-
-			var today = new Date();
-			var birthDate = new Date(this.state.dob);
-			var age = today.getFullYear() - birthDate.getFullYear();
-			var m = today.getMonth() - birthDate.getMonth();
-			if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
-			{
-					age--;
-			}
-			if(age >= 21)
-			{
-				showMessage({
-					message: "21+ Guest Added to Event!",
-					type: "info",
-					duration: 3000,
-					backgroundColor: "green",
-				});
-			}else{
-				showMessage({
-					message: "Under 21 Guest Added to the Event!",
-					type: "info",
-					duration: 3000,
-					backgroundColor: "blue",
-				});
-			}
-
-			break;
-      case 'ExpiredError':
-        // TODO
-        break;
-    }
-  });
-
-      // Resets the input boxes to empty after the submission
-      // Taken out right now for test demonstration
-		/*	this.setState({licNum: "",
-=======
       });
 
       alert("Guest Added To The Event List!");
@@ -275,50 +79,34 @@ export default class App extends Component<Props> {
   }
 
   onPressTest() {
-    //Need to set up new test... will only be size of max set above
+    var ran;
+    var arrayObj = [];
+    const testData = {
+      licNum: 'S1000000',
+      dob: '12/04/1995',
+      fName: 'Bhars',
+      lName: 'Corcoran',
+      address: '123 Test st',
+      town: 'Testville',
+      st8: 'Testachussets',
+      gndr: 'T'
+    };
 
-    var num = 1;
-    var temp = 10000000;
-    console.log("starting...");
-    var start = new Date();
+    for(var x = 0; x <50; x++){
+      testData.licNum = 'S1000000';
+      //ran = (Math.floor(Math.random() * 5000)+1);
+        testData.licNum = testData.licNum + x;
 
-    setInterval(() => {
-      for (num; num < 50; num++) {
-        var testData = {
-          licNum: temp,
-          dob: "10/25/1996",
-          fName: "Tester",
-          lName: "Smith",
-          address: "123 Street St",
-          town: "Testville",
-          st8: "MA",
-          gndr: "?"
-        };
         sha256(testData.licNum)
           .then(hash => {
             testData.licNum = hash;
-            return testData;
-          })
-          .then(testData => {
-            sha256(testData.address).then(hash => {
-              testData.address = hash;
-            });
-            return testData;
-          })
-          .then(testData => {
-            return storage.save({
-              // dynamic key
-              key: testData.licNum, // Note: Do not use underscore("_") in key!
-              data: testData,
+          }
+        arrayObj[] = testData;
+        console.warn(arrayObj);
+    }
+    //Need to set up new test... will only be size of max set above
 
-              // if expires not specified, the defaultExpires will be applied instead.
-              // if set to null, then it will never expire.
-              expires: 1000 * 3600
-            });
-          });
-        temp = temp + 1;
-      }
-    }, 1000);
+
   }
   //Function for submit button
   onPressEnterData() {
@@ -433,7 +221,6 @@ export default class App extends Component<Props> {
     // Resets the input boxes to empty after the submission
     // Taken out right now for test demonstration
     /*	this.setState({licNum: "",
->>>>>>> origin/newIanTest
 										dob: "",
 										fName: "",
 										lName: "",
@@ -715,8 +502,4 @@ const styles = StyleSheet.create({
   }
 });
 //needed since we are not using create-react-native-app
-<<<<<<< HEAD
-AppRegistry.registerComponent('Test', () => UselessTextInput);
-=======
 AppRegistry.registerComponent("Test", () => UselessTextInput);
->>>>>>> origin/newIanTest
