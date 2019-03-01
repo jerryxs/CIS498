@@ -71,6 +71,17 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
+    this.state = {
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    };
+
     this.socket = io("http://134.88.133.46:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
@@ -78,10 +89,6 @@ export default class App extends Component<Props> {
     this.socket.on("gotBannedList", listData => {
       var bannedList = listData.bannedList;
       console.warn(bannedList.length);
-
-      /*for (var i = 0; i < bannedList.length; i++) {
-        console.warn(bannedList[i]);
-      }*/
 
       bannedList.forEach(bannedGuest => {
         console.warn(bannedGuest);
@@ -100,9 +107,10 @@ export default class App extends Component<Props> {
           .then(bannedGuest => {
             return bannedListStorage.save({
               key: bannedGuest.licNum,
+              id: bannedGuest.fName,
               data: bannedGuest,
 
-              expires: 1000 * 3600
+              expires: 1000 * 3600 * 24
             });
           });
       });
@@ -122,63 +130,77 @@ export default class App extends Component<Props> {
 
       alert("Guest Added To The Event List!");
     });
-
-    this.state = {
-      licNum: "",
-      dob: "",
-      fName: "",
-      lName: "",
-      address: "",
-      town: "",
-      st8: "",
-      gndr: ""
-    };
   }
 
   onPressTest() {
-    //Need to set up new test... will only be size of max set above
-    /*var num = 1;
-    var temp = 10000000;
-    console.log("starting...");
-    var start = new Date();
+    const data = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
+    };
 
-    setInterval(() => {
-      for (num; num < 50; num++) {
-        var testData = {
-          licNum: temp,
-          dob: "10/25/1996",
-          fName: "Tester",
-          lName: "Smith",
-          address: "123 Street St",
-          town: "Testville",
-          st8: "MA",
-          gndr: "?"
-        };
-        sha256(testData.licNum)
-          .then(hash => {
-            testData.licNum = hash;
-            return testData;
-          })
-          .then(testData => {
-            sha256(testData.address).then(hash => {
-              testData.address = hash;
-            });
-            return testData;
-          })
-          .then(testData => {
-            return storage.save({
-              // dynamic key
-              key: testData.licNum, // Note: Do not use underscore("_") in key!
-              data: testData,
+    sha256(data.licNum)
+      .then(hash => {
+        data.licNum = hash;
 
-              // if expires not specified, the defaultExpires will be applied instead.
-              // if set to null, then it will never expire.
-              expires: 1000 * 3600
-            });
+        return data;
+      })
+      .then(data => {
+        sha256(data.address).then(hash => {
+          data.address = hash;
+        });
+        return data;
+      })
+      .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
+
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+
+            // syncInBackground (default: true) means if data expired,
+            // return the outdated data first while invoking the sync method.
+            // If syncInBackground is set to false, and there is expired data,
+            // it will wait for the new data and return only after the sync completed.
+            // (This, of course, is slower)
+            syncInBackground: true,
+
+            // you can pass extra params to the sync method
+            // see sync example below
+            syncParams: {
+              extraFetchOptions: {
+                // blahblah
+              },
+              someFlag: true
+            }
+          })
+          .then(ret => {
+            // found data go to then()
+            alert("guest is banned");
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                // TODO;
+                break;
+              case "ExpiredError":
+                // TODO
+                console.warn("here");
+                break;
+            }
           });
-        temp = temp + 1;
-      }
-    }, 1000);*/
+      });
+
     console.warn(bannedListStorage);
   }
   //Function for submit button
@@ -436,7 +458,11 @@ export default class App extends Component<Props> {
               title="Submit"
               color="purple"
             />
-            <Button onPress={this.onPressTest} title="Test" color="purple" />
+            <Button
+              onPress={this.onPressTest.bind(this)}
+              title="Test"
+              color="purple"
+            />
           </View>
         </View>
         <FlashMessage position="top" />
