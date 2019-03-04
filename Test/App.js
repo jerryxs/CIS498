@@ -117,7 +117,33 @@ export default class App extends Component<Props> {
     });
 
     this.socket.on("needGuestList", data => {
-      console.warn(data.guestList);
+      var guestList = data.guestList;
+
+      guestList.forEach(guest => {
+        var info = guest.dataStored;
+        console.warn(info);
+        sha256(info.licNum)
+          .then(hash => {
+            info.licNum = hash;
+
+            return info;
+          })
+          .then(info => {
+            sha256(info.address).then(hash => {
+              info.address = hash;
+            });
+            return info;
+          })
+          .then(info => {
+            return storage.save({
+              key: info.licNum,
+              data: info,
+
+              expires: 1000 * 3600
+            });
+          });
+      });
+      console.warn(storage);
     });
 
     // Use this area to listen to signals from server and do something...
@@ -390,6 +416,7 @@ export default class App extends Component<Props> {
       st8: "",
       gndr: ""
     });*/
+    console.warn(storage);
   }
 
   render() {

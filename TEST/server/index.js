@@ -90,8 +90,8 @@ io.on("connection", function(socket) {
 
   function submitPressed() {
     socket.on("onPressEnterData", data => {
-      //console.log("Client Message: ");
-      //console.log(data.dataStored);
+      console.log("Client Message: ");
+      console.log(data.dataStored);
 
       socket.broadcast.emit("receiveUserData", { data });
 
