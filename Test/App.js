@@ -82,7 +82,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
+    this.socket = io("http://172.18.11.158:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -107,7 +107,7 @@ export default class App extends Component<Props> {
           .then(bannedGuest => {
             return bannedListStorage.save({
               key: bannedGuest.licNum,
-              id: bannedGuest.fName,
+              //id: bannedGuest.fName,
               data: bannedGuest,
 
               expires: 1000 * 3600 * 24
