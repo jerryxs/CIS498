@@ -7,6 +7,7 @@ var fs = require("fs");
 var path = require("path");
 var arr = [];
 var bannedList = [];
+var guestList = [];
 
 server.listen(8000);
 
@@ -87,12 +88,25 @@ io.on("connection", function(socket) {
 
   listNotEmpty();
 
-  socket.on("onPressEnterData", data => {
-    console.log("Client Message: ");
-    console.log(data.dataStored);
+  function submitPressed() {
+    socket.on("onPressEnterData", data => {
+      console.log("Client Message: ");
+      console.log(data.dataStored);
 
-    //const user = data.csvData;
+      socket.broadcast.emit("receiveUserData", { data });
 
-    socket.broadcast.emit("receiveUserData", { data });
-  });
+      guestList.push(data);
+
+      /*guestList.forEach(guest => {
+      console.log(guest);
+    });*/
+    });
+    return guestList;
+  }
+
+  var myList = submitPressed();
+
+  if (myList.length !== 0) {
+    socket.emit("needGuestList", { guestList });
+  }
 });
