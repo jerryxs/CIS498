@@ -84,7 +84,7 @@ export default class App extends Component<Props> {
 
     this.socket = io("http://134.88.133.46:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
-      alert("No Banned List detected!");
+      console.warn("No Banned List detected!");
     });
     this.socket.on("gotBannedList", listData => {
       var bannedList = listData.bannedList;
@@ -107,13 +107,17 @@ export default class App extends Component<Props> {
           .then(bannedGuest => {
             return bannedListStorage.save({
               key: bannedGuest.licNum,
-              id: bannedGuest.fName,
+              //id: bannedGuest.licNum,
               data: bannedGuest,
 
               expires: 1000 * 3600 * 24
             });
           });
       });
+    });
+
+    this.socket.on("needGuestList", data => {
+      console.warn(data.guestList);
     });
 
     // Use this area to listen to signals from server and do something...
@@ -130,6 +134,56 @@ export default class App extends Component<Props> {
 
       alert("Guest Added To The Event List!");
     });
+  }
+
+  onPressTest2() {
+    var arrayObj = [];
+    var testData = {
+      licNum: "1000000",
+      dob: "12/04/1995",
+      fName: "Bhars",
+      lName: "Corcoran",
+      address: "123 Test st",
+      town: "Testville",
+      st8: "Testachussets",
+      gndr: "T"
+    };
+
+    for (var x = 0; x < 50; x++) {
+      //testData.licNum = "S1000000";
+      var licNum = parseInt(testData.licNum);
+      licNum++;
+
+      //console.warn(licNum);
+
+      testData = {
+        licNum: licNum.toString(),
+        dob: "12/04/1995",
+        fName: "Bhars",
+        lName: "Corcoran",
+        address: "123 Test st",
+        town: "Testville",
+        st8: "Testachussets",
+        gndr: "T"
+      };
+
+      console.warn(testData);
+      sha256(testData.licNum)
+        .then(hash => {
+          testData.licNum = hash;
+          return testData;
+        })
+        .then(testData => {
+          sha256(testData.address).then(hash => {
+            testData.address = hash;
+          });
+          return testData;
+        })
+        .then(testData => {
+          arrayObj.push(testData);
+        });
+    }
+    console.warn(arrayObj);
   }
 
   onPressTest() {
@@ -461,6 +515,11 @@ export default class App extends Component<Props> {
             <Button
               onPress={this.onPressTest.bind(this)}
               title="Test"
+              color="purple"
+            />
+            <Button
+              onPress={this.onPressTest2.bind(this)}
+              title="Test2"
               color="purple"
             />
           </View>
