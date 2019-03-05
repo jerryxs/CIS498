@@ -82,7 +82,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.11.158:8000"); // connects to the local server
+    this.socket = io("http://134.88.141.18:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
