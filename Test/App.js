@@ -2,27 +2,17 @@ import React, { Component } from "react";
 import {
   AppRegistry,
   Button,
-  TextInput,
-  Platform,
   StyleSheet,
   AsyncStorage,
   Text,
   ScrollView,
-  InteractionManager,
-  View,
-  PermissionsAndroid
+  View
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
-import FlashMessage, {
-  showMessage,
-  hideMessage
-} from "react-native-flash-message";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
-import { Hoshi, Akira, Kaede } from "react-native-textinput-effects";
-//import DeviceInfo from 'react-native-device-info';
-
-//console.disableYellowBox = true;
+import { Kaede } from "react-native-textinput-effects";
 
 const storage = new Storage({
   // maximum capacity, default 1000
@@ -177,11 +167,8 @@ export default class App extends Component<Props> {
     };
 
     for (var x = 0; x < 50; x++) {
-      //testData.licNum = "S1000000";
       var licNum = parseInt(testData.licNum);
       licNum++;
-
-      //console.warn(licNum);
 
       testData = {
         licNum: licNum.toString(),
@@ -262,7 +249,7 @@ export default class App extends Component<Props> {
               someFlag: true
             }
           })
-          .then(ret => {
+          .then(() => {
             // found data go to then()
             alert("guest is banned");
           })
@@ -336,7 +323,7 @@ export default class App extends Component<Props> {
           }
         });
       })
-      .then(ret => {
+      .then(() => {
         // found data go to then()
         showMessage({
           message: "Duplicate Warning!",
@@ -349,7 +336,6 @@ export default class App extends Component<Props> {
       .catch(err => {
         // any exception including data not found
         // goes to catch()
-        //console.warn(err.message);
         switch (err.name) {
           case "NotFoundError":
             this.socket.emit("onPressEnterData", { dataStored });
@@ -405,18 +391,6 @@ export default class App extends Component<Props> {
         }
       });
 
-    // Resets the input boxes to empty after the submission
-    // Taken out right now for test demonstration
-    /*this.setState({
-      licNum: "",
-      dob: "",
-      fName: "",
-      lName: "",
-      address: "",
-      town: "",
-      st8: "",
-      gndr: ""
-    });*/
     console.warn(storage);
   }
 
