@@ -343,7 +343,7 @@ export default class App extends Component<Props> {
           description: "Guest Has Already Entered The Event",
           duration: 3000,
           type: "info",
-          backgroundColor: "red"
+          backgroundColor: "#8e202f"
         });
       })
       .catch(err => {
@@ -376,14 +376,14 @@ export default class App extends Component<Props> {
                 message: "21+ Guest Added to Event!",
                 type: "info",
                 duration: 3000,
-                backgroundColor: "green"
+                backgroundColor: "#2aaf37"
               });
             } else {
               showMessage({
                 message: "Under 21 Guest Added to the Event!",
                 type: "info",
                 duration: 3000,
-                backgroundColor: "blue"
+                backgroundColor: "#02004f"
               });
             }
 
