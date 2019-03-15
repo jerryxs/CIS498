@@ -19,6 +19,7 @@ import FlashMessage, {
   hideMessage
 } from "react-native-flash-message";
 import Storage from "react-native-storage";
+import { Hoshi, Akira, Kaede } from "react-native-textinput-effects";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -82,7 +83,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.141.18:8000"); // connects to the local server
+    this.socket = io("http://192.168.86.31:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
@@ -423,29 +424,33 @@ export default class App extends Component<Props> {
     return (
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
-          <View style={styles.container} />
-          <View style={{ flex: 1, backgroundColor: "skyblue" }} />
-
-          <View style={{ flex: 1, backgroundColor: "steelblue" }} />
           <Text style={styles.welcome}>EManage</Text>
           <Text style={styles.instructions}>
             Please Enter the Following Data
           </Text>
-
-          <TextInput
-            style={styles.textBox}
+        </View>
+        <View style={[styles.card1, { backgroundColor: "#F9F7F6" }]}>
+          <Kaede
+            style={styles.input}
+            label={"License Number"}
             onChangeText={licNum => this.setState({ licNum })}
             value={this.state.licNum}
-            placeholder="License Number"
             returnKeyType="next"
             onSubmitEditing={() => {
               this.dateInput.focus();
             }}
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"MM/DD/YYYY"}
             onChangeText={dob => this.setState({ dob })}
             value={this.state.dob}
             returnKeyType="next"
@@ -453,12 +458,18 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.firstNameInput.focus();
             }}
-            placeholder="MM/DD/YYYY"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"First Name"}
             onChangeText={fName => this.setState({ fName })}
             value={this.state.fName}
             returnKeyType="next"
@@ -466,12 +477,18 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.lastNameInput.focus();
             }}
-            placeholder="First Name"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"Last Name"}
             onChangeText={lName => this.setState({ lName })}
             value={this.state.lName}
             returnKeyType="next"
@@ -479,12 +496,18 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.addressInput.focus();
             }}
-            placeholder="Last Name"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"Address"}
             onChangeText={address => this.setState({ address })}
             value={this.state.address}
             returnKeyType="next"
@@ -492,12 +515,18 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.townInput.focus();
             }}
-            placeholder="Address"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"Town"}
             onChangeText={town => this.setState({ town })}
             value={this.state.town}
             returnKeyType="next"
@@ -505,12 +534,18 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.st8Input.focus();
             }}
-            placeholder="Town"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"State"}
             onChangeText={st8 => this.setState({ st8 })}
             value={this.state.st8}
             returnKeyType="next"
@@ -518,21 +553,42 @@ export default class App extends Component<Props> {
             onSubmitEditing={() => {
               this.genderInput.focus();
             }}
-            placeholder="State"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={styles.textBox}
+          <Kaede
+            style={styles.input}
+            label={"Gender"}
             onChangeText={gndr => this.setState({ gndr })}
             value={this.state.gndr}
             returnKeyType="go"
             ref={input => (this.genderInput = input)}
-            placeholder="Gender"
-            placeholderTextColor="gray"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
+
           <View
-            style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}
+            style={[
+              {
+                width: "59%",
+                margin: 10,
+                backgroundColor: "purple",
+                justifyContent: "center",
+                alignItems: "center"
+              }
+            ]}
           >
             <Button
               onPress={this.onPressEnterData.bind(this)}
@@ -565,15 +621,16 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 25,
     color: "black",
     textAlign: "center",
     margin: 10
   },
   instructions: {
+    fontSize: 15,
     textAlign: "center",
     color: "#333333",
-    marginBottom: 5
+    marginBottom: 1
   },
   textBox: {
     height: 40,
@@ -581,6 +638,21 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 2,
     textAlign: "center"
+  },
+  card1: {
+    paddingVertical: 8
+  },
+  input: {
+    marginTop: 2,
+    textAlign: "center"
+  },
+  title: {
+    paddingBottom: 8,
+    textAlign: "center",
+    color: "#404d5b",
+    fontSize: 16,
+    fontWeight: "bold",
+    opacity: 0.8
   }
 });
 //needed since we are not using create-react-native-app
