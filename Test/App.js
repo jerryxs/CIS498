@@ -436,6 +436,7 @@ export default class App extends Component<Props> {
             onChangeText={licNum => this.setState({ licNum })}
             value={this.state.licNum}
             returnKeyType="next"
+            blurOnSubmit={false}
             onSubmitEditing={() => {
               this.dateInput.focus();
             }}
@@ -454,6 +455,7 @@ export default class App extends Component<Props> {
             onChangeText={dob => this.setState({ dob })}
             value={this.state.dob}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.dateInput = input)}
             onSubmitEditing={() => {
               this.firstNameInput.focus();
@@ -473,6 +475,7 @@ export default class App extends Component<Props> {
             onChangeText={fName => this.setState({ fName })}
             value={this.state.fName}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.firstNameInput = input)}
             onSubmitEditing={() => {
               this.lastNameInput.focus();
@@ -492,6 +495,7 @@ export default class App extends Component<Props> {
             onChangeText={lName => this.setState({ lName })}
             value={this.state.lName}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.lastNameInput = input)}
             onSubmitEditing={() => {
               this.addressInput.focus();
@@ -511,6 +515,7 @@ export default class App extends Component<Props> {
             onChangeText={address => this.setState({ address })}
             value={this.state.address}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.addressInput = input)}
             onSubmitEditing={() => {
               this.townInput.focus();
@@ -530,6 +535,7 @@ export default class App extends Component<Props> {
             onChangeText={town => this.setState({ town })}
             value={this.state.town}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.townInput = input)}
             onSubmitEditing={() => {
               this.st8Input.focus();
@@ -549,6 +555,7 @@ export default class App extends Component<Props> {
             onChangeText={st8 => this.setState({ st8 })}
             value={this.state.st8}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.st8Input = input)}
             onSubmitEditing={() => {
               this.genderInput.focus();
