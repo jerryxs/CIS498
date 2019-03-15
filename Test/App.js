@@ -582,18 +582,14 @@ export default class App extends Component<Props> {
           <View
             style={[
               {
-                width: "59%",
-                margin: 10,
-                backgroundColor: "purple",
-                justifyContent: "center",
-                alignItems: "center"
+                margin: 10
               }
             ]}
           >
             <Button
               onPress={this.onPressEnterData.bind(this)}
               title="Submit"
-              color="purple"
+              color="#2aaf37"
             />
             <Button
               onPress={this.onPressTest.bind(this)}
@@ -632,27 +628,12 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 1
   },
-  textBox: {
-    height: 40,
-    width: "59%",
-    borderColor: "gray",
-    borderWidth: 2,
-    textAlign: "center"
-  },
   card1: {
     paddingVertical: 8
   },
   input: {
     marginTop: 2,
     textAlign: "center"
-  },
-  title: {
-    paddingBottom: 8,
-    textAlign: "center",
-    color: "#404d5b",
-    fontSize: 16,
-    fontWeight: "bold",
-    opacity: 0.8
   }
 });
 //needed since we are not using create-react-native-app
