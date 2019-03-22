@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import {
   AppRegistry,
   Button,
+  TextInput,
+  Platform,
   StyleSheet,
   AsyncStorage,
   Text,
@@ -13,6 +15,21 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
+
+  InteractionManager,
+  View,
+  PermissionsAndroid
+} from "react-native";
+import { sha256 } from "react-native-sha256";
+import io from "socket.io-client/dist/socket.io";
+import FlashMessage, {
+  showMessage,
+  hideMessage
+} from "react-native-flash-message";
+import Storage from "react-native-storage";
+//import DeviceInfo from 'react-native-device-info';
+
+//console.disableYellowBox = true;
 
 const storage = new Storage({
   // maximum capacity, default 1000
@@ -73,7 +90,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://192.168.86.31:8000"); // connects to the local server
+    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
@@ -167,8 +184,11 @@ export default class App extends Component<Props> {
     };
 
     for (var x = 0; x < 50; x++) {
+      //testData.licNum = "S1000000";
       var licNum = parseInt(testData.licNum);
       licNum++;
+
+      //console.warn(licNum);
 
       testData = {
         licNum: licNum.toString(),
@@ -249,7 +269,7 @@ export default class App extends Component<Props> {
               someFlag: true
             }
           })
-          .then(() => {
+          .then(ret => {
             // found data go to then()
             alert("guest is banned");
           })
@@ -301,8 +321,14 @@ export default class App extends Component<Props> {
       .then(dataStored => {
         return storage.load({
           // same dynamic key
-          key: dataStored.licNum,
+            key: dataStored.licNum,
+        }
+        .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
 
+       
           // autoSync (default: true) means if data is not found or has expired,
           // then invoke the corresponding sync method
           autoSync: true,
@@ -323,7 +349,26 @@ export default class App extends Component<Props> {
           }
         });
       })
-      .then(() => {
+         .then(ret => {
+            // found data go to then()
+            alert("guest is banned");
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                // TODO;
+                break;
+              case "ExpiredError":
+                // TODO
+                console.warn("here");
+                break;
+            }
+          }));
+        })
+      .then(ret => {
         // found data go to then()
         showMessage({
           message: "Duplicate Warning!",
