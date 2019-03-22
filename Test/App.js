@@ -1,276 +1,612 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React, {
-    Component,
-    Document,
-} from 'react';
-
+import React, { Component } from "react";
 import {
-    AppRegistry,
-    Button,
-    TextInput,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-} from 'react-native';
+  AppRegistry,
+  Button,
+  TextInput,
+  Platform,
+  StyleSheet,
+  AsyncStorage,
+  Text,
+  ScrollView,
+  InteractionManager,
+  View,
+  PermissionsAndroid
+} from "react-native";
+import { sha256 } from "react-native-sha256";
+import io from "socket.io-client/dist/socket.io";
+import FlashMessage, {
+  showMessage,
+  hideMessage
+} from "react-native-flash-message";
+import Storage from "react-native-storage";
+//import DeviceInfo from 'react-native-device-info';
 
-import { RNCamera } from 'react-native-camera';
+//console.disableYellowBox = true;
 
-import {
-    createStackNavigator,
-    StackActions,
-    NavigationActions
-} from 'react-navigation';
+const storage = new Storage({
+  // maximum capacity, default 1000
+  size: 500000,
+
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {}
+});
+
+const bannedListStorage = new Storage({
+  // maximum capacity, default 1000
+  size: 100000,
+
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {}
+});
 
 type Props = {};
-class App extends Component<Props> {
-    
-    constructor(props) {
-        super(props);
-        this.state = {
-        licNum: "",
-        dob: "",
-        fName: "",
-        lName: "",
-        address: "",
-        town: "",
-        st8: "",
-        gndr: ""
-        };
-    }
+export default class App extends Component<Props> {
+  //Add states for input boxes
+  constructor(props) {
+    super(props);
 
-    onPressEnterData(){
-        // Idea: when the submit button is pressed... then make the array
-        // for the csv + continue tutorial functions...
-        var csvData = [{
-                       // May not need to add the strings each time.
-                       // Probably makes more sense to append to the first row of the csv file the lables
-                       'LicenseNum' : this.state.licNum,
-                       'DateOfBirth' : this.state.dob,
-                       'FirstName' : this.state.fName,
-                       'LastName' : this.state.lName,
-                       'Address' : this.state.address,
-                       'Town' : this.state.town,
-                       'State' : this.state.st8,
-                       'Gender' : this.state.gndr
-                       }];
-        
-        // just makes a warning pop up with the data entered in the text boxes
-        console.warn(csvData);
-    }
-    
-    render() {
-        return (
-                <View style={{flex: 1}}>
-                <View style={{flex: 1, backgroundColor: 'powderblue'}} />
-                <Text style={styles.welcome}>EManage</Text>
-                <Text style={styles.instructions}>Please Enter the Following Data</Text>
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2 , textAlign: 'center' }}
-                onChangeText={(licNum) => this.setState({licNum})}
-                value={this.state.licNum}
-                placeholder = "License Number"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(dob) => this.setState({dob})}
-                value={this.state.dob}
-                placeholder = "Date of Birth"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(fName) => this.setState({fName})}
-                value={this.state.fName}
-                placeholder = "First Name"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(lName) => this.setState({lName})}
-                value={this.state.lName}
-                placeholder = "Last Name"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(address) => this.setState({address})}
-                value={this.state.address}
-                placeholder = "Address"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(town) => this.setState({town})}
-                value={this.state.town}
-                placeholder = "Town"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(st8) => this.setState({st8})}
-                value={this.state.st8}
-                placeholder = "State"
-                />
-                
-                <TextInput
-                style={{height: 40, width: 100, borderColor: 'gray', borderWidth: 2}}
-                style={{height: 40, borderColor: 'gray', borderWidth: 2, textAlign: 'center'}}
-                onChangeText={(gndr) => this.setState({gndr})}
-                value={this.state.gndr}
-                placeholder = "Gender"
-                />
-                
-                <Button onPress ={this.onPressEnterData.bind(this)}
-                title="Submit"
-                color='purple'
-                />
-                
-                <Button
-                title="Open Camera"
-                onPress = {() => {
-                this.props.navigation.dispatch(StackActions.reset({
-                      index: 0,
-                      actions: [
-                                NavigationActions.navigate({ routeName: 'Camera'})
-                                ],
-                            }))
-                }}
-                color='steelblue'
-                />
-                
-                <View style={{flex: 2, backgroundColor: 'skyblue'}} />
-                <View style={{flex: 3, backgroundColor: 'steelblue'}} />
+    this.state = {
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    };
 
-                </View>
-                
-                );
-    }
-    
-}
-
-class cameraScreen extends React.Component {
-    render() {
-        return(
-               
-               < View style={{flex: 2, backgroundColor: 'skyblue'}} >
-               
-               <RNCamera
-               ref={ref => {
-               this.camera = ref;
-               }}
-               style = {styles.preview}
-               type={RNCamera.Constants.Type.back}
-               flashMode={RNCamera.Constants.FlashMode.on}
-               permissionDialogTitle={'Permission to use camera'}
-               permissionDialogMessage={'We need your permission to use your camera phone'}
-               onGoogleVisionBarcodesDetected={({ barcodes }) => {
-               console.log(barcodes)
-               }}
-               />
-               
-               <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
-               <TouchableOpacity
-               onPress={this.takePicture.bind(this)}
-               style = {styles.capture}
-               >
-               <Text style={{fontSize: 14}}> SNAP </Text>
-               </TouchableOpacity>
-               </View>
-               
-               <Button
-               title="Return"
-               onPress = {() => {
-               this.props.navigation.dispatch(StackActions.reset({
-                     index: 0,
-                     actions: [
-                               NavigationActions.navigate({ routeName: 'UserInput'})
-                               ],
-                     }))
-               }}
-               color='steelblue'
-               />
-               
-               </View>
-               );
-    }
-    takePicture = async function(camera) {
-        try{
-        const options = { quality: 0.5, base64: true };
-        const data = await camera.takePictureAsync(options);
-        //  eslint-disable-next-line
-        console.log(data.uri);
-        } catch(e) {
-            console.log(e)
-        }
-    }
-}
-
-export default createStackNavigator({
-            Camera: {
-            screen: cameraScreen,
-            },
-            UserInput: {
-            screen: App,
-            },
-        }, { initialRouteName: 'UserInput',
+    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
+    this.socket.on("noBannedList", () => {
+      console.warn("No Banned List detected!");
     });
+    this.socket.on("gotBannedList", listData => {
+      var bannedList = listData.bannedList;
+      console.warn(bannedList.length);
+
+      bannedList.forEach(bannedGuest => {
+        console.warn(bannedGuest);
+        sha256(bannedGuest.licNum)
+          .then(hash => {
+            bannedGuest.licNum = hash;
+
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            sha256(bannedGuest.address).then(hash => {
+              bannedGuest.address = hash;
+            });
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            return bannedListStorage.save({
+              key: bannedGuest.licNum,
+              //id: bannedGuest.licNum,
+              data: bannedGuest,
+
+              expires: 1000 * 3600 * 24
+            });
+          });
+      });
+    });
+
+    this.socket.on("needGuestList", data => {
+      var guestList = data.guestList;
+
+      guestList.forEach(guest => {
+        var info = guest.dataStored;
+        console.warn(info);
+        sha256(info.licNum)
+          .then(hash => {
+            info.licNum = hash;
+
+            return info;
+          })
+          .then(info => {
+            sha256(info.address).then(hash => {
+              info.address = hash;
+            });
+            return info;
+          })
+          .then(info => {
+            return storage.save({
+              key: info.licNum,
+              data: info,
+
+              expires: 1000 * 3600
+            });
+          });
+      });
+      console.warn(storage);
+    });
+
+    // Use this area to listen to signals from server and do something...
+    this.socket.on("receiveUserData", data => {
+      storage.save({
+        // dynamic key
+        key: data.data.dataStored.licNum, // Note: Do not use underscore("_") in key!
+        data: data.data.dataStored,
+
+        // if expires not specified, the defaultExpires will be applied instead.
+        // if set to null, then it will never expire.
+        expires: 1000 * 3600
+      });
+
+      alert("Guest Added To The Event List!");
+    });
+  }
+
+  onPressTest2() {
+    var arrayObj = [];
+    var testData = {
+      licNum: "1000000",
+      dob: "12/04/1995",
+      fName: "Bhars",
+      lName: "Corcoran",
+      address: "123 Test st",
+      town: "Testville",
+      st8: "Testachussets",
+      gndr: "T"
+    };
+
+    for (var x = 0; x < 50; x++) {
+      //testData.licNum = "S1000000";
+      var licNum = parseInt(testData.licNum);
+      licNum++;
+
+      //console.warn(licNum);
+
+      testData = {
+        licNum: licNum.toString(),
+        dob: "12/04/1995",
+        fName: "Bhars",
+        lName: "Corcoran",
+        address: "123 Test st",
+        town: "Testville",
+        st8: "Testachussets",
+        gndr: "T"
+      };
+
+      console.warn(testData);
+      sha256(testData.licNum)
+        .then(hash => {
+          testData.licNum = hash;
+          return testData;
+        })
+        .then(testData => {
+          sha256(testData.address).then(hash => {
+            testData.address = hash;
+          });
+          return testData;
+        })
+        .then(testData => {
+          arrayObj.push(testData);
+        });
+    }
+    console.warn(arrayObj);
+  }
+
+  onPressTest() {
+    const data = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
+    };
+
+    sha256(data.licNum)
+      .then(hash => {
+        data.licNum = hash;
+
+        return data;
+      })
+      .then(data => {
+        sha256(data.address).then(hash => {
+          data.address = hash;
+        });
+        return data;
+      })
+      .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
+
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+
+            // syncInBackground (default: true) means if data expired,
+            // return the outdated data first while invoking the sync method.
+            // If syncInBackground is set to false, and there is expired data,
+            // it will wait for the new data and return only after the sync completed.
+            // (This, of course, is slower)
+            syncInBackground: true,
+
+            // you can pass extra params to the sync method
+            // see sync example below
+            syncParams: {
+              extraFetchOptions: {
+                // blahblah
+              },
+              someFlag: true
+            }
+          })
+          .then(ret => {
+            // found data go to then()
+            alert("guest is banned");
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                // TODO;
+                break;
+              case "ExpiredError":
+                // TODO
+                console.warn("here");
+                break;
+            }
+          });
+      });
+
+    console.warn(bannedListStorage);
+  }
+  //Function for submit button
+  onPressEnterData() {
+    //When submit is pressed, an array is populated with the new state of each input box
+
+    const dataStored = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
+    };
+
+    sha256(dataStored.licNum)
+      .then(hash => {
+        dataStored.licNum = hash;
+
+        return dataStored;
+      })
+      .then(dataStored => {
+        sha256(dataStored.address).then(hash => {
+          dataStored.address = hash;
+        });
+        return dataStored;
+      })
+      .then(dataStored => {
+        return storage.load({
+          // same dynamic key
+            key: dataStored.licNum,
+        }
+        .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
+
+       
+          // autoSync (default: true) means if data is not found or has expired,
+          // then invoke the corresponding sync method
+          autoSync: true,
+
+          // syncInBackground (default: true) means if data expired,
+          // return the outdated data first while invoking the sync method.
+          // If syncInBackground is set to false, and there is expired data,
+          // it will wait for the new data and return only after the sync completed.
+          // (This, of course, is slower)
+          syncInBackground: true,
+
+          // you can pass extra params to the sync method
+          syncParams: {
+            extraFetchOptions: {
+              // none
+            },
+            someFlag: true
+          }
+        });
+      })
+         .then(ret => {
+            // found data go to then()
+            alert("guest is banned");
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                // TODO;
+                break;
+              case "ExpiredError":
+                // TODO
+                console.warn("here");
+                break;
+            }
+          }));
+        })
+      .then(ret => {
+        // found data go to then()
+        showMessage({
+          message: "Duplicate Warning!",
+          description: "Guest Has Already Entered The Event",
+          duration: 3000,
+          type: "info",
+          backgroundColor: "red"
+        });
+      })
+      .catch(err => {
+        // any exception including data not found
+        // goes to catch()
+        //console.warn(err.message);
+        switch (err.name) {
+          case "NotFoundError":
+            this.socket.emit("onPressEnterData", { dataStored });
+
+            storage.save({
+              // dynamic key
+              key: dataStored.licNum, // Note: Do not use underscore("_") in key!
+              data: dataStored,
+
+              // if expires not specified, the defaultExpires will be applied instead.
+              // if set to null, then it will never expire.
+              expires: 1000 * 3600
+            });
+
+            var today = new Date();
+            var birthDate = new Date(this.state.dob);
+            var age = today.getFullYear() - birthDate.getFullYear();
+            var m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            if (age >= 21) {
+              showMessage({
+                message: "21+ Guest Added to Event!",
+                type: "info",
+                duration: 3000,
+                backgroundColor: "green"
+              });
+            } else {
+              showMessage({
+                message: "Under 21 Guest Added to the Event!",
+                type: "info",
+                duration: 3000,
+                backgroundColor: "blue"
+              });
+            }
+
+            this.setState({
+              licNum: "",
+              dob: "",
+              fName: "",
+              lName: "",
+              address: "",
+              town: "",
+              st8: "",
+              gndr: ""
+            });
+
+            break;
+          case "ExpiredError":
+            // TODO
+            break;
+        }
+      });
+
+    // Resets the input boxes to empty after the submission
+    // Taken out right now for test demonstration
+    /*this.setState({
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    });*/
+    console.warn(storage);
+  }
+
+  render() {
+    return (
+      <ScrollView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.container} />
+          <View style={{ flex: 1, backgroundColor: "skyblue" }} />
+
+          <View style={{ flex: 1, backgroundColor: "steelblue" }} />
+          <Text style={styles.welcome}>EManage</Text>
+          <Text style={styles.instructions}>
+            Please Enter the Following Data
+          </Text>
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={licNum => this.setState({ licNum })}
+            value={this.state.licNum}
+            placeholder="License Number"
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              this.dateInput.focus();
+            }}
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={dob => this.setState({ dob })}
+            value={this.state.dob}
+            returnKeyType="next"
+            ref={input => (this.dateInput = input)}
+            onSubmitEditing={() => {
+              this.firstNameInput.focus();
+            }}
+            placeholder="MM/DD/YYYY"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={fName => this.setState({ fName })}
+            value={this.state.fName}
+            returnKeyType="next"
+            ref={input => (this.firstNameInput = input)}
+            onSubmitEditing={() => {
+              this.lastNameInput.focus();
+            }}
+            placeholder="First Name"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={lName => this.setState({ lName })}
+            value={this.state.lName}
+            returnKeyType="next"
+            ref={input => (this.lastNameInput = input)}
+            onSubmitEditing={() => {
+              this.addressInput.focus();
+            }}
+            placeholder="Last Name"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={address => this.setState({ address })}
+            value={this.state.address}
+            returnKeyType="next"
+            ref={input => (this.addressInput = input)}
+            onSubmitEditing={() => {
+              this.townInput.focus();
+            }}
+            placeholder="Address"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={town => this.setState({ town })}
+            value={this.state.town}
+            returnKeyType="next"
+            ref={input => (this.townInput = input)}
+            onSubmitEditing={() => {
+              this.st8Input.focus();
+            }}
+            placeholder="Town"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={st8 => this.setState({ st8 })}
+            value={this.state.st8}
+            returnKeyType="next"
+            ref={input => (this.st8Input = input)}
+            onSubmitEditing={() => {
+              this.genderInput.focus();
+            }}
+            placeholder="State"
+            placeholderTextColor="gray"
+          />
+
+          <TextInput
+            style={styles.textBox}
+            onChangeText={gndr => this.setState({ gndr })}
+            value={this.state.gndr}
+            returnKeyType="go"
+            ref={input => (this.genderInput = input)}
+            placeholder="Gender"
+            placeholderTextColor="gray"
+          />
+          <View
+            style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}
+          >
+            <Button
+              onPress={this.onPressEnterData.bind(this)}
+              title="Submit"
+              color="purple"
+            />
+            <Button
+              onPress={this.onPressTest.bind(this)}
+              title="Test"
+              color="purple"
+            />
+            <Button
+              onPress={this.onPressTest2.bind(this)}
+              title="Test2"
+              color="purple"
+            />
+          </View>
+        </View>
+        <FlashMessage position="top" />
+      </ScrollView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
-        container: {
-         flex: 1,
-         justifyContent: 'center',
-         alignItems: 'center',
-         backgroundColor: '#F5FCFF',
-        },
-        welcome: {
-         fontSize: 20,
-         textAlign: 'center',
-         margin: 10,
-        },
-        instructions: {
-         textAlign: 'center',
-         color: '#333333',
-         marginBottom: 5,
-        },
-        license: {
-         height: 40,
-         width: 100,
-         borderColor: 'gray',
-         borderWidth: 2
-        },
-        preview: {
-         flex: 1,
-         justifyContent: 'flex-end',
-         alignItems: 'center',
-        },
-        capture: {
-         flex: 0,
-         backgroundColor: '#fff',
-         borderRadius: 5,
-         padding: 15,
-         paddingHorizontal: 20,
-         alignSelf: 'center',
-         margin: 20,
-        }
-    });
-
+  container: {
+    flex: 1,
+    margin: 10,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  welcome: {
+    fontSize: 20,
+    color: "black",
+    textAlign: "center",
+    margin: 10
+  },
+  instructions: {
+    textAlign: "center",
+    color: "#333333",
+    marginBottom: 5
+  },
+  textBox: {
+    height: 40,
+    width: "59%",
+    borderColor: "gray",
+    borderWidth: 2,
+    textAlign: "center"
+  }
+});
 //needed since we are not using create-react-native-app
-AppRegistry.registerComponent('Test', () => UselessTextInput);
+AppRegistry.registerComponent("Test", () => UselessTextInput);
