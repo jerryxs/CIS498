@@ -284,124 +284,207 @@ export default class App extends Component<Props> {
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
+    function bannedCheck() {
+      const data = {
+        licNum: this.state.licNum,
+        dob: this.state.dob,
+        fName: this.state.fName,
+        lName: this.state.lName,
+        address: this.state.address,
+        town: this.state.town,
+        st8: this.state.st8,
+        gndr: this.state.gndr
+      };
 
-    const dataStored = {
-      licNum: this.state.licNum,
-      dob: this.state.dob,
-      fName: this.state.fName,
-      lName: this.state.lName,
-      address: this.state.address,
-      town: this.state.town,
-      st8: this.state.st8,
-      gndr: this.state.gndr
-    };
+      sha256(data.licNum)
+        .then(hash => {
+          data.licNum = hash;
 
-    sha256(dataStored.licNum)
-      .then(hash => {
-        dataStored.licNum = hash;
+          return data;
+        })
+        .then(data => {
+          sha256(data.address).then(hash => {
+            data.address = hash;
+          });
+          return data;
+        })
 
-        return dataStored;
-      })
-      .then(dataStored => {
-        sha256(dataStored.address).then(hash => {
-          dataStored.address = hash;
+        .then(data => {
+          return bannedListStorage
+            .load({
+              key: data.licNum,
+
+              // autoSync (default: true) means if data is not found or has expired,
+              // then invoke the corresponding sync method
+              autoSync: true,
+
+              // syncInBackground (default: true) means if data expired,
+              // return the outdated data first while invoking the sync method.
+              // If syncInBackground is set to false, and there is expired data,
+              // it will wait for the new data and return only after the sync completed.
+              // (This, of course, is slower)
+              syncInBackground: true,
+
+              // you can pass extra params to the sync method
+              // see sync example below
+              syncParams: {
+                extraFetchOptions: {
+                  // blahblah
+                },
+                someFlag: true
+              }
+            })
+            .then(ret => {
+              // found banned guest
+              showMessage({
+                message: "Banned Guest",
+                description: "This Person is Banned from Attending this Event",
+                duration: 3000,
+                type: "info",
+                backgroundColor: "black"
+              });
+              return true;
+            })
+            .catch(err => {
+              // any exception including data not found
+              // goes to catch()
+              console.warn(err.message);
+              switch (err.name) {
+                case "NotFoundError":
+                  // TODO;
+                  break;
+                case "ExpiredError":
+                  // TODO
+                  console.warn("here");
+                  break;
+              }
+              return false;
+            });
         });
-        return dataStored;
-      })
-      .then(dataStored => {
-        return storage.load({
-          // same dynamic key
-          key: dataStored.licNum,
+    }
 
-          // autoSync (default: true) means if data is not found or has expired,
-          // then invoke the corresponding sync method
-          autoSync: true,
+    if (bannedCheck) {
+      bannedCheck();
+    } else {
+      const dataStored = {
+        licNum: this.state.licNum,
+        dob: this.state.dob,
+        fName: this.state.fName,
+        lName: this.state.lName,
+        address: this.state.address,
+        town: this.state.town,
+        st8: this.state.st8,
+        gndr: this.state.gndr
+      };
 
-          // syncInBackground (default: true) means if data expired,
-          // return the outdated data first while invoking the sync method.
-          // If syncInBackground is set to false, and there is expired data,
-          // it will wait for the new data and return only after the sync completed.
-          // (This, of course, is slower)
-          syncInBackground: true,
+      sha256(dataStored.licNum)
+        .then(hash => {
+          dataStored.licNum = hash;
 
-          // you can pass extra params to the sync method
-          syncParams: {
-            extraFetchOptions: {
-              // none
-            },
-            someFlag: true
+          return dataStored;
+        })
+        .then(dataStored => {
+          sha256(dataStored.address).then(hash => {
+            dataStored.address = hash;
+          });
+          return dataStored;
+        })
+
+        .then(dataStored => {
+          return storage.load({
+            // same dynamic key
+            key: dataStored.licNum,
+
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+
+            // syncInBackground (default: true) means if data expired,
+            // return the outdated data first while invoking the sync method.
+            // If syncInBackground is set to false, and there is expired data,
+            // it will wait for the new data and return only after the sync completed.
+            // (This, of course, is slower)
+            syncInBackground: true,
+
+            // you can pass extra params to the sync method
+            syncParams: {
+              extraFetchOptions: {
+                // none
+              },
+              someFlag: true
+            }
+          });
+        })
+
+        .then(ret => {
+          // found data go to then()
+          showMessage({
+            message: "Duplicate Warning!",
+            description: "Guest Has Already Entered The Event",
+            duration: 3000,
+            type: "info",
+            backgroundColor: "red"
+          });
+        })
+        .catch(err => {
+          // any exception including data not found
+          // goes to catch()
+          //console.warn(err.message);
+          switch (err.name) {
+            case "NotFoundError":
+              this.socket.emit("onPressEnterData", { dataStored });
+
+              storage.save({
+                // dynamic key
+                key: dataStored.licNum, // Note: Do not use underscore("_") in key!
+                data: dataStored,
+
+                // if expires not specified, the defaultExpires will be applied instead.
+                // if set to null, then it will never expire.
+                expires: 1000 * 3600
+              });
+
+              var today = new Date();
+              var birthDate = new Date(this.state.dob);
+              var age = today.getFullYear() - birthDate.getFullYear();
+              var m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+              if (age >= 21) {
+                showMessage({
+                  message: "21+ Guest Added to Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "green"
+                });
+              } else {
+                showMessage({
+                  message: "Under 21 Guest Added to the Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "blue"
+                });
+              }
+
+              this.setState({
+                licNum: "",
+                dob: "",
+                fName: "",
+                lName: "",
+                address: "",
+                town: "",
+                st8: "",
+                gndr: ""
+              });
+
+              break;
+            case "ExpiredError":
+              // TODO
+              break;
           }
         });
-      })
-      .then(ret => {
-        // found data go to then()
-        showMessage({
-          message: "Duplicate Warning!",
-          description: "Guest Has Already Entered The Event",
-          duration: 3000,
-          type: "info",
-          backgroundColor: "red"
-        });
-      })
-      .catch(err => {
-        // any exception including data not found
-        // goes to catch()
-        //console.warn(err.message);
-        switch (err.name) {
-          case "NotFoundError":
-            this.socket.emit("onPressEnterData", { dataStored });
-
-            storage.save({
-              // dynamic key
-              key: dataStored.licNum, // Note: Do not use underscore("_") in key!
-              data: dataStored,
-
-              // if expires not specified, the defaultExpires will be applied instead.
-              // if set to null, then it will never expire.
-              expires: 1000 * 3600
-            });
-
-            var today = new Date();
-            var birthDate = new Date(this.state.dob);
-            var age = today.getFullYear() - birthDate.getFullYear();
-            var m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
-            if (age >= 21) {
-              showMessage({
-                message: "21+ Guest Added to Event!",
-                type: "info",
-                duration: 3000,
-                backgroundColor: "green"
-              });
-            } else {
-              showMessage({
-                message: "Under 21 Guest Added to the Event!",
-                type: "info",
-                duration: 3000,
-                backgroundColor: "blue"
-              });
-            }
-
-            this.setState({
-              licNum: "",
-              dob: "",
-              fName: "",
-              lName: "",
-              address: "",
-              town: "",
-              st8: "",
-              gndr: ""
-            });
-
-            break;
-          case "ExpiredError":
-            // TODO
-            break;
-        }
-      });
-
+    }
     // Resets the input boxes to empty after the submission
     // Taken out right now for test demonstration
     /*this.setState({
