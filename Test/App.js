@@ -8,25 +8,15 @@ import {
   AsyncStorage,
   Text,
   ScrollView,
-  View
+  View,
+  InteractionManager,
+  PermissionsAndroid
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
-
-  InteractionManager,
-  View,
-  PermissionsAndroid
-} from "react-native";
-import { sha256 } from "react-native-sha256";
-import io from "socket.io-client/dist/socket.io";
-import FlashMessage, {
-  showMessage,
-  hideMessage
-} from "react-native-flash-message";
-import Storage from "react-native-storage";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -319,55 +309,55 @@ export default class App extends Component<Props> {
         return dataStored;
       })
       .then(dataStored => {
-        return storage.load({
-          // same dynamic key
-            key: dataStored.licNum,
-        }
-        .then(data => {
-        return bannedListStorage
-          .load({
-            key: data.licNum,
-
-       
-          // autoSync (default: true) means if data is not found or has expired,
-          // then invoke the corresponding sync method
-          autoSync: true,
-
-          // syncInBackground (default: true) means if data expired,
-          // return the outdated data first while invoking the sync method.
-          // If syncInBackground is set to false, and there is expired data,
-          // it will wait for the new data and return only after the sync completed.
-          // (This, of course, is slower)
-          syncInBackground: true,
-
-          // you can pass extra params to the sync method
-          syncParams: {
-            extraFetchOptions: {
-              // none
-            },
-            someFlag: true
+        return storage.load(
+          {
+            // same dynamic key
+            key: dataStored.licNum
           }
-        });
+            .then(data => {
+              return bannedListStorage.load({
+                key: data.licNum,
+
+                // autoSync (default: true) means if data is not found or has expired,
+                // then invoke the corresponding sync method
+                autoSync: true,
+
+                // syncInBackground (default: true) means if data expired,
+                // return the outdated data first while invoking the sync method.
+                // If syncInBackground is set to false, and there is expired data,
+                // it will wait for the new data and return only after the sync completed.
+                // (This, of course, is slower)
+                syncInBackground: true,
+
+                // you can pass extra params to the sync method
+                syncParams: {
+                  extraFetchOptions: {
+                    // none
+                  },
+                  someFlag: true
+                }
+              });
+            })
+            .then(ret => {
+              // found data go to then()
+              alert("guest is banned");
+            })
+            .catch(err => {
+              // any exception including data not found
+              // goes to catch()
+              console.warn(err.message);
+              switch (err.name) {
+                case "NotFoundError":
+                  // TODO;
+                  break;
+                case "ExpiredError":
+                  // TODO
+                  console.warn("here");
+                  break;
+              }
+            })
+        );
       })
-         .then(ret => {
-            // found data go to then()
-            alert("guest is banned");
-          })
-          .catch(err => {
-            // any exception including data not found
-            // goes to catch()
-            console.warn(err.message);
-            switch (err.name) {
-              case "NotFoundError":
-                // TODO;
-                break;
-              case "ExpiredError":
-                // TODO
-                console.warn("here");
-                break;
-            }
-          }));
-        })
       .then(ret => {
         // found data go to then()
         showMessage({
