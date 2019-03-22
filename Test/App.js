@@ -549,6 +549,7 @@ export default class App extends Component<Props> {
             onChangeText={gndr => this.setState({ gndr })}
             value={this.state.gndr}
             returnKeyType="go"
+            blurOnSubmit={true}
             ref={input => (this.genderInput = input)}
             labelStyle={{
               color: "white",
