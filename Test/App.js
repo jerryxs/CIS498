@@ -80,7 +80,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.133.46:8000"); // connects to the local server
+    this.socket = io("http://172.18.13.142:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
@@ -309,54 +309,29 @@ export default class App extends Component<Props> {
         return dataStored;
       })
       .then(dataStored => {
-        return storage.load(
-          {
-            // same dynamic key
-            key: dataStored.licNum
+        return storage.load({
+          // same dynamic key
+          key: dataStored.licNum,
+
+          // autoSync (default: true) means if data is not found or has expired,
+          // then invoke the corresponding sync method
+          autoSync: true,
+
+          // syncInBackground (default: true) means if data expired,
+          // return the outdated data first while invoking the sync method.
+          // If syncInBackground is set to false, and there is expired data,
+          // it will wait for the new data and return only after the sync completed.
+          // (This, of course, is slower)
+          syncInBackground: true,
+
+          // you can pass extra params to the sync method
+          syncParams: {
+            extraFetchOptions: {
+              // none
+            },
+            someFlag: true
           }
-            .then(data => {
-              return bannedListStorage.load({
-                key: data.licNum,
-
-                // autoSync (default: true) means if data is not found or has expired,
-                // then invoke the corresponding sync method
-                autoSync: true,
-
-                // syncInBackground (default: true) means if data expired,
-                // return the outdated data first while invoking the sync method.
-                // If syncInBackground is set to false, and there is expired data,
-                // it will wait for the new data and return only after the sync completed.
-                // (This, of course, is slower)
-                syncInBackground: true,
-
-                // you can pass extra params to the sync method
-                syncParams: {
-                  extraFetchOptions: {
-                    // none
-                  },
-                  someFlag: true
-                }
-              });
-            })
-            .then(ret => {
-              // found data go to then()
-              alert("guest is banned");
-            })
-            .catch(err => {
-              // any exception including data not found
-              // goes to catch()
-              console.warn(err.message);
-              switch (err.name) {
-                case "NotFoundError":
-                  // TODO;
-                  break;
-                case "ExpiredError":
-                  // TODO
-                  console.warn("here");
-                  break;
-              }
-            })
-        );
+        });
       })
       .then(ret => {
         // found data go to then()
@@ -365,12 +340,13 @@ export default class App extends Component<Props> {
           description: "Guest Has Already Entered The Event",
           duration: 3000,
           type: "info",
-          backgroundColor: "#8e202f"
+          backgroundColor: "red"
         });
       })
       .catch(err => {
         // any exception including data not found
         // goes to catch()
+        //console.warn(err.message);
         switch (err.name) {
           case "NotFoundError":
             this.socket.emit("onPressEnterData", { dataStored });
@@ -397,14 +373,14 @@ export default class App extends Component<Props> {
                 message: "21+ Guest Added to Event!",
                 type: "info",
                 duration: 3000,
-                backgroundColor: "#2aaf37"
+                backgroundColor: "green"
               });
             } else {
               showMessage({
                 message: "Under 21 Guest Added to the Event!",
                 type: "info",
                 duration: 3000,
-                backgroundColor: "#02004f"
+                backgroundColor: "blue"
               });
             }
 
@@ -426,6 +402,18 @@ export default class App extends Component<Props> {
         }
       });
 
+    // Resets the input boxes to empty after the submission
+    // Taken out right now for test demonstration
+    /*this.setState({
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    });*/
     console.warn(storage);
   }
 
