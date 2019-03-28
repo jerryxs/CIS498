@@ -5,9 +5,10 @@ var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
 var fs = require("fs");
 var path = require("path");
+var ObjectsToCsv = require("objects-to-csv");
+const csv = require("csvtojson");
 var arr = [];
 var bannedList = [];
-var guestList = [];
 
 server.listen(8000);
 
@@ -89,24 +90,27 @@ io.on("connection", function(socket) {
   listNotEmpty();
 
   function submitPressed() {
+    var guestList = [];
     socket.on("onPressEnterData", data => {
       console.log("Client Message: ");
       console.log(data.dataStored);
 
       socket.broadcast.emit("receiveUserData", { data });
 
-      guestList.push(data);
-
-      /*guestList.forEach(guest => {
-      console.log(guest);
-    });*/
+      guestList.push(data.dataStored);
+      new ObjectsToCsv(guestList).toDisk("./guests.csv", { append: true });
+      guestList.pop(data.dataStored);
     });
     return guestList;
   }
 
   var myList = submitPressed();
-
-  if (myList.length !== 0) {
-    socket.emit("needGuestList", { guestList });
+  if (fs.existsSync("./guests.csv")) {
+    csv()
+      .fromFile("./guests.csv")
+      .then(jsonObj => {
+        socket.emit("needGuestList", { jsonObj });
+        console.log(jsonObj);
+      });
   }
 });
