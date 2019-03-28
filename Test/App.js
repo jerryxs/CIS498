@@ -68,15 +68,14 @@ export default class App extends Component<Props> {
     this.socket.on(
       "gotBannedList",
       listData => {
-        var bannedList = listData.bannedList;
-        console.warn(bannedList.length);
+        var bannedList = listData.bannedGuestList;
+        //console.warn(bannedList.length);
 
         bannedList.forEach(bannedGuest => {
           console.warn(bannedGuest);
           sha256(bannedGuest.licNum)
             .then(hash => {
               bannedGuest.licNum = hash;
-
               return bannedGuest;
             })
             .then(bannedGuest => {
@@ -199,29 +198,25 @@ export default class App extends Component<Props> {
       gndr: this.state.gndr
     };
 
-    function checkBanned() {
-      sha256(dataStored.licNum)
-        .then(hash => {
-          dataStored.licNum = hash;
+    sha256(dataStored.licNum)
+      .then(hash => {
+        dataStored.licNum = hash;
 
-          return dataStored;
-        })
-        .then(dataStored => {
-          sha256(dataStored.address).then(hash => {
-            dataStored.address = hash;
-          });
-          return dataStored;
-        })
-
-        .then(dataStored => {
-          return getProperty(dataStored.licNum);
-        })
-        .then(ret => {
-          alert("Guest Banned");
+        return dataStored;
+      })
+      .then(dataStored => {
+        sha256(dataStored.address).then(hash => {
+          dataStored.address = hash;
         });
-    }
+        return dataStored;
+      })
 
-    checkBanned();
+      .then(dataStored => {
+        return getProperty(dataStored.licNum);
+      })
+      .then(ret => {
+        alert("Guest Banned");
+      });
 
     sha256(dataStored.licNum)
       .then(hash => {

@@ -78,16 +78,16 @@ io.on("connection", function(socket) {
   // log the socket ID of the device
   console.log(socket.id);
 
-  // Function to check to see if the banned list is available
-  function listNotEmpty() {
-    if (bannedList.length !== 0) {
-      socket.emit("gotBannedList", { bannedList });
-    } else {
-      socket.emit("noBannedList");
-    }
+  if (fs.existsSync("./server/fileupload/test.csv")) {
+    csv()
+      .fromFile("./test.csv")
+      .then(bannedGuestList => {
+        socket.emit("gotBannedList", { bannedGuestList });
+        console.log(bannedGuestList);
+      });
+  } else {
+    socket.emit("noBannedList");
   }
-
-  listNotEmpty();
 
   function submitPressed() {
     var guestList = [];
@@ -104,7 +104,6 @@ io.on("connection", function(socket) {
     return guestList;
   }
 
-  var myList = submitPressed();
   if (fs.existsSync("./guests.csv")) {
     csv()
       .fromFile("./guests.csv")
