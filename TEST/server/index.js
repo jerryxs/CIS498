@@ -5,9 +5,10 @@ var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
 var fs = require("fs");
 var path = require("path");
+var ObjectsToCsv = require("objects-to-csv");
+const csv = require("csvtojson");
 var arr = [];
 var bannedList = [];
-var guestList = [];
 
 server.listen(8000);
 
@@ -77,36 +78,38 @@ io.on("connection", function(socket) {
   // log the socket ID of the device
   console.log(socket.id);
 
-  // Function to check to see if the banned list is available
-  function listNotEmpty() {
-    if (bannedList.length !== 0) {
-      socket.emit("gotBannedList", { bannedList });
-    } else {
-      socket.emit("noBannedList");
-    }
+  if (fs.existsSync("./server/fileupload/test.csv")) {
+    csv()
+      .fromFile("./test.csv")
+      .then(bannedGuestList => {
+        socket.emit("gotBannedList", { bannedGuestList });
+        console.log(bannedGuestList);
+      });
+  } else {
+    socket.emit("noBannedList");
   }
 
-  listNotEmpty();
-
   function submitPressed() {
+    var guestList = [];
     socket.on("onPressEnterData", data => {
       console.log("Client Message: ");
       console.log(data.dataStored);
 
       socket.broadcast.emit("receiveUserData", { data });
 
-      guestList.push(data);
-
-      /*guestList.forEach(guest => {
-      console.log(guest);
-    });*/
+      guestList.push(data.dataStored);
+      new ObjectsToCsv(guestList).toDisk("./guests.csv", { append: true });
+      guestList.pop(data.dataStored);
     });
     return guestList;
   }
 
-  var myList = submitPressed();
-
-  if (myList.length !== 0) {
-    socket.emit("needGuestList", { guestList });
+  if (fs.existsSync("./guests.csv")) {
+    csv()
+      .fromFile("./guests.csv")
+      .then(jsonObj => {
+        socket.emit("needGuestList", { jsonObj });
+        console.log(jsonObj);
+      });
   }
 });

@@ -41,26 +41,8 @@ const storage = new Storage({
   // the latest data.
   sync: {}
 });
-const bannedListStorage = new Storage({
-  // maximum capacity, default 1000
-  size: 100000,
 
-  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
-  // If storageBackend is not set, data will be lost after reload.
-  storageBackend: AsyncStorage, // for web: window.localStorage
-
-  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
-  // can be null, which means never expire.
-  defaultExpires: 1000 * 3600 * 24,
-
-  // cache data in the memory. default is true.
-  enableCache: true,
-
-  // if data was not found in storage or expired data was found,
-  // the corresponding sync method will be invoked returning
-  // the latest data.
-  sync: {}
-});
+var bannedGuestObj = [];
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -79,67 +61,54 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.13.142:8000"); // connects to the local server
+    this.socket = io("http://172.18.6.109:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
-    this.socket.on("gotBannedList", listData => {
-      var bannedList = listData.bannedList;
-      console.warn(bannedList.length);
+    this.socket.on(
+      "gotBannedList",
+      listData => {
+        var bannedList = listData.bannedGuestList;
+        //console.warn(bannedList.length);
 
-      bannedList.forEach(bannedGuest => {
-        console.warn(bannedGuest);
-        sha256(bannedGuest.licNum)
-          .then(hash => {
-            bannedGuest.licNum = hash;
-
-            return bannedGuest;
-          })
-          .then(bannedGuest => {
-            sha256(bannedGuest.address).then(hash => {
-              bannedGuest.address = hash;
+        bannedList.forEach(bannedGuest => {
+          console.warn(bannedGuest);
+          sha256(bannedGuest.licNum)
+            .then(hash => {
+              bannedGuest.licNum = hash;
+              return bannedGuest;
+            })
+            .then(bannedGuest => {
+              sha256(bannedGuest.address).then(hash => {
+                bannedGuest.address = hash;
+              });
+              return bannedGuest;
+            })
+            .then(bannedGuest => {
+              // I want to do this in each index of my array...
+              bannedGuestObj.push(bannedGuest);
             });
-            return bannedGuest;
-          })
-          .then(bannedGuest => {
-            return bannedListStorage.save({
-              key: bannedGuest.licNum,
-              //id: bannedGuest.licNum,
-              data: bannedGuest,
-
-              expires: 1000 * 3600 * 24
-            });
-          });
-      });
-    });
+        });
+      },
+      console.warn("Banned Guest Obj" + bannedGuestObj)
+    );
 
     this.socket.on("needGuestList", data => {
-      var guestList = data.guestList;
+      var guestList = data.jsonObj;
+      console.warn(guestList);
 
       guestList.forEach(guest => {
-        var info = guest.dataStored;
-        console.warn(info);
-        sha256(info.licNum)
-          .then(hash => {
-            info.licNum = hash;
+        storage.save({
+          // dynamic key
+          key: guest.licNum, // Note: Do not use underscore("_") in key!
+          data: guest,
 
-            return info;
-          })
-          .then(info => {
-            sha256(info.address).then(hash => {
-              info.address = hash;
-            });
-            return info;
-          })
-          .then(info => {
-            return storage.save({
-              key: info.licNum,
-              data: info,
-
-              expires: 1000 * 3600
-            });
-          });
+          // if expires not specified, the defaultExpires will be applied instead.
+          // if set to null, then it will never expire.
+          expires: 1000 * 3600
+        });
       });
+
       console.warn(storage);
     });
 
@@ -158,86 +127,6 @@ export default class App extends Component<Props> {
       alert("Guest Added To The Event List!");
     });
   }
-
-  /*bannedCheck() {
-    const data = {
-      licNum: this.state.licNum,
-      dob: this.state.dob,
-      fName: this.state.fName,
-      lName: this.state.lName,
-      address: this.state.address,
-      town: this.state.town,
-      st8: this.state.st8,
-      gndr: this.state.gndr
-    };
-
-    sha256(data.licNum)
-      .then(hash => {
-        data.licNum = hash;
-
-        return data;
-      })
-      .then(data => {
-        sha256(data.address).then(hash => {
-          data.address = hash;
-        });
-        return data;
-      })
-
-      .then(data => {
-        return bannedListStorage
-          .load({
-            key: data.licNum,
-
-            // autoSync (default: true) means if data is not found or has expired,
-            // then invoke the corresponding sync method
-            autoSync: true,
-
-            // syncInBackground (default: true) means if data expired,
-            // return the outdated data first while invoking the sync method.
-            // If syncInBackground is set to false, and there is expired data,
-            // it will wait for the new data and return only after the sync completed.
-            // (This, of course, is slower)
-            syncInBackground: true,
-
-            // you can pass extra params to the sync method
-            // see sync example below
-            syncParams: {
-              extraFetchOptions: {
-                // blahblah
-              },
-              someFlag: true
-            }
-          })
-          .then(ret => {
-            // found banned guest
-            showMessage({
-              message: "Banned Guest",
-              description: "This Person is Banned from Attending this Event",
-              duration: 3000,
-              type: "info",
-              backgroundColor: "black"
-            });
-            return true;
-          })
-          .catch(err => {
-            // any exception including data not found
-            // goes to catch()
-            console.warn(err.message);
-            switch (err.name) {
-              case "NotFoundError":
-                // TODO;
-                break;
-              case "ExpiredError":
-                // TODO
-                console.warn("here");
-                break;
-            }
-            return false;
-          });
-      });
-    return false;
-  }*/
 
   onPressTest2() {
     var arrayObj = [];
@@ -289,162 +178,14 @@ export default class App extends Component<Props> {
     console.warn(arrayObj);
   }
 
-  onPressTest() {
-    const data = {
-      licNum: this.state.licNum,
-      dob: this.state.dob,
-      fName: this.state.fName,
-      lName: this.state.lName,
-      address: this.state.address,
-      town: this.state.town,
-      st8: this.state.st8,
-      gndr: this.state.gndr
-    };
-
-    sha256(data.licNum)
-      .then(hash => {
-        data.licNum = hash;
-
-        return data;
-      })
-      .then(data => {
-        sha256(data.address).then(hash => {
-          data.address = hash;
-        });
-        return data;
-      })
-      .then(data => {
-        return bannedListStorage
-          .load({
-            key: data.licNum,
-
-            // autoSync (default: true) means if data is not found or has expired,
-            // then invoke the corresponding sync method
-            autoSync: true,
-
-            // syncInBackground (default: true) means if data expired,
-            // return the outdated data first while invoking the sync method.
-            // If syncInBackground is set to false, and there is expired data,
-            // it will wait for the new data and return only after the sync completed.
-            // (This, of course, is slower)
-            syncInBackground: true,
-
-            // you can pass extra params to the sync method
-            // see sync example below
-            syncParams: {
-              extraFetchOptions: {
-                // blahblah
-              },
-              someFlag: true
-            }
-          })
-          .then(ret => {
-            // found data go to then()
-            alert("guest is banned");
-          })
-          .catch(err => {
-            // any exception including data not found
-            // goes to catch()
-            console.warn(err.message);
-            switch (err.name) {
-              case "NotFoundError":
-                alert("Not Found");
-            }
-          });
-      });
-
-    //console.warn(bannedListStorage);
-  }
-
+  onPressTest() {}
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
-    //var guestIsBanned = bannedCheck();
 
-    do {
-      const data = {
-        licNum: this.state.licNum,
-        dob: this.state.dob,
-        fName: this.state.fName,
-        lName: this.state.lName,
-        address: this.state.address,
-        town: this.state.town,
-        st8: this.state.st8,
-        gndr: this.state.gndr
-      };
-
-      sha256(data.licNum)
-        .then(hash => {
-          data.licNum = hash;
-
-          return data;
-        })
-        .then(data => {
-          sha256(data.address).then(hash => {
-            data.address = hash;
-          });
-          return data;
-        })
-
-        .then(data => {
-          return bannedListStorage
-            .load({
-              key: data.licNum,
-
-              // autoSync (default: true) means if data is not found or has expired,
-              // then invoke the corresponding sync method
-              autoSync: true,
-
-              // syncInBackground (default: true) means if data expired,
-              // return the outdated data first while invoking the sync method.
-              // If syncInBackground is set to false, and there is expired data,
-              // it will wait for the new data and return only after the sync completed.
-              // (This, of course, is slower)
-              syncInBackground: true,
-
-              // you can pass extra params to the sync method
-              // see sync example below
-              syncParams: {
-                extraFetchOptions: {
-                  // blahblah
-                },
-                someFlag: true
-              }
-            })
-            .then(ret => {
-              // found banned guest
-              showMessage({
-                message: "Banned Guest",
-                description: "This Person is Banned from Attending this Event",
-                duration: 3000,
-                type: "info",
-                backgroundColor: "black"
-              });
-              return true;
-            })
-
-            .catch(err => {
-              // any exception including data not found
-              // goes to catch()
-              console.warn(err.message);
-              switch (err.name) {
-                case "NotFoundError":
-                  // TODO;
-                  break;
-                case "ExpiredError":
-                  // TODO
-                  console.warn("here");
-                  break;
-              }
-              return false;
-            });
-        });
-      break;
-    } while (true);
-
-    /*if (guestIsBanned == true) {
-      bannedCheck();
-    } else {*/
+    var getProperty = function(propertyName) {
+      return bannedGuestObj[propertyName];
+    };
 
     const dataStored = {
       licNum: this.state.licNum,
@@ -456,6 +197,26 @@ export default class App extends Component<Props> {
       st8: this.state.st8,
       gndr: this.state.gndr
     };
+
+    sha256(dataStored.licNum)
+      .then(hash => {
+        dataStored.licNum = hash;
+
+        return dataStored;
+      })
+      .then(dataStored => {
+        sha256(dataStored.address).then(hash => {
+          dataStored.address = hash;
+        });
+        return dataStored;
+      })
+
+      .then(dataStored => {
+        return getProperty(dataStored.licNum);
+      })
+      .then(ret => {
+        alert("Guest Banned");
+      });
 
     sha256(dataStored.licNum)
       .then(hash => {
@@ -564,7 +325,7 @@ export default class App extends Component<Props> {
             break;
         }
       });
-    //}
+
     // Resets the input boxes to empty after the submission
     // Taken out right now for test demonstration
     /*this.setState({
@@ -577,7 +338,6 @@ export default class App extends Component<Props> {
       st8: "",
       gndr: ""
     });*/
-    console.warn(storage);
   }
 
   render() {
