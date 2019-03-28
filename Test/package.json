@@ -8,7 +8,11 @@
     "server": "nodemon server"
   },
   "dependencies": {
+    "busboy": "^0.3.0",
+    "connect-busboy": "0.0.2",
+    "convert-csv-to-json": "0.0.13",
     "express": "^4.16.4",
+    "express-fileupload": "^1.1.1-alpha.3",
     "nodemon": "^1.18.9",
     "react": "16.6.3",
     "react-native": "0.58.4",
@@ -16,6 +20,7 @@
     "react-native-sha256": "^1.2.3",
     "react-native-socketio": "^0.3.0",
     "react-native-storage": "^1.0.0-beta.1",
+    "react-native-textinput-effects": "^0.5.1",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },

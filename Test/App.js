@@ -8,17 +8,15 @@ import {
   AsyncStorage,
   Text,
   ScrollView,
-  InteractionManager,
   View,
+  InteractionManager,
   PermissionsAndroid
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
-import FlashMessage, {
-  showMessage,
-  hideMessage
-} from "react-native-flash-message";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
+import { Kaede } from "react-native-textinput-effects";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -43,6 +41,26 @@ const storage = new Storage({
   // the latest data.
   sync: {}
 });
+const bannedListStorage = new Storage({
+  // maximum capacity, default 1000
+  size: 100000,
+
+  // Use AsyncStorage for RN apps, or window.localStorage for web apps.
+  // If storageBackend is not set, data will be lost after reload.
+  storageBackend: AsyncStorage, // for web: window.localStorage
+
+  // expire time, default: 1 day (1000 * 3600 * 24 milliseconds).
+  // can be null, which means never expire.
+  defaultExpires: 1000 * 3600 * 24,
+
+  // cache data in the memory. default is true.
+  enableCache: true,
+
+  // if data was not found in storage or expired data was found,
+  // the corresponding sync method will be invoked returning
+  // the latest data.
+  sync: {}
+});
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -50,7 +68,81 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.socket = io("http://172.18.1.199:8000"); // connects to the local server
+    this.state = {
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    };
+
+    this.socket = io("http://172.18.13.142:8000"); // connects to the local server
+    this.socket.on("noBannedList", () => {
+      console.warn("No Banned List detected!");
+    });
+    this.socket.on("gotBannedList", listData => {
+      var bannedList = listData.bannedList;
+      console.warn(bannedList.length);
+
+      bannedList.forEach(bannedGuest => {
+        console.warn(bannedGuest);
+        sha256(bannedGuest.licNum)
+          .then(hash => {
+            bannedGuest.licNum = hash;
+
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            sha256(bannedGuest.address).then(hash => {
+              bannedGuest.address = hash;
+            });
+            return bannedGuest;
+          })
+          .then(bannedGuest => {
+            return bannedListStorage.save({
+              key: bannedGuest.licNum,
+              //id: bannedGuest.licNum,
+              data: bannedGuest,
+
+              expires: 1000 * 3600 * 24
+            });
+          });
+      });
+    });
+
+    this.socket.on("needGuestList", data => {
+      var guestList = data.guestList;
+
+      guestList.forEach(guest => {
+        var info = guest.dataStored;
+        console.warn(info);
+        sha256(info.licNum)
+          .then(hash => {
+            info.licNum = hash;
+
+            return info;
+          })
+          .then(info => {
+            sha256(info.address).then(hash => {
+              info.address = hash;
+            });
+            return info;
+          })
+          .then(info => {
+            return storage.save({
+              key: info.licNum,
+              data: info,
+
+              expires: 1000 * 3600
+            });
+          });
+      });
+      console.warn(storage);
+    });
+
     // Use this area to listen to signals from server and do something...
     this.socket.on("receiveUserData", data => {
       storage.save({
@@ -65,52 +157,294 @@ export default class App extends Component<Props> {
 
       alert("Guest Added To The Event List!");
     });
+  }
 
-    this.state = {
-      licNum: "",
-      dob: "",
-      fName: "",
-      lName: "",
-      address: "",
-      town: "",
-      st8: "",
-      gndr: ""
+  /*bannedCheck() {
+    const data = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
     };
+
+    sha256(data.licNum)
+      .then(hash => {
+        data.licNum = hash;
+
+        return data;
+      })
+      .then(data => {
+        sha256(data.address).then(hash => {
+          data.address = hash;
+        });
+        return data;
+      })
+
+      .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
+
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
+
+            // syncInBackground (default: true) means if data expired,
+            // return the outdated data first while invoking the sync method.
+            // If syncInBackground is set to false, and there is expired data,
+            // it will wait for the new data and return only after the sync completed.
+            // (This, of course, is slower)
+            syncInBackground: true,
+
+            // you can pass extra params to the sync method
+            // see sync example below
+            syncParams: {
+              extraFetchOptions: {
+                // blahblah
+              },
+              someFlag: true
+            }
+          })
+          .then(ret => {
+            // found banned guest
+            showMessage({
+              message: "Banned Guest",
+              description: "This Person is Banned from Attending this Event",
+              duration: 3000,
+              type: "info",
+              backgroundColor: "black"
+            });
+            return true;
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                // TODO;
+                break;
+              case "ExpiredError":
+                // TODO
+                console.warn("here");
+                break;
+            }
+            return false;
+          });
+      });
+    return false;
+  }*/
+
+  onPressTest2() {
+    var arrayObj = [];
+    var testData = {
+      licNum: "1000000",
+      dob: "12/04/1995",
+      fName: "Bhars",
+      lName: "Corcoran",
+      address: "123 Test st",
+      town: "Testville",
+      st8: "Testachussets",
+      gndr: "T"
+    };
+
+    for (var x = 0; x < 50; x++) {
+      //testData.licNum = "S1000000";
+      var licNum = parseInt(testData.licNum);
+      licNum++;
+
+      //console.warn(licNum);
+
+      testData = {
+        licNum: licNum.toString(),
+        dob: "12/04/1995",
+        fName: "Bhars",
+        lName: "Corcoran",
+        address: "123 Test st",
+        town: "Testville",
+        st8: "Testachussets",
+        gndr: "T"
+      };
+
+      console.warn(testData);
+      sha256(testData.licNum)
+        .then(hash => {
+          testData.licNum = hash;
+          return testData;
+        })
+        .then(testData => {
+          sha256(testData.address).then(hash => {
+            testData.address = hash;
+          });
+          return testData;
+        })
+        .then(testData => {
+          arrayObj.push(testData);
+        });
+    }
+    console.warn(arrayObj);
   }
 
   onPressTest() {
-    var ran;
-    var arrayObj = [];
-    const testData = {
-      licNum: 'S1000000',
-      dob: '12/04/1995',
-      fName: 'Bhars',
-      lName: 'Corcoran',
-      address: '123 Test st',
-      town: 'Testville',
-      st8: 'Testachussets',
-      gndr: 'T'
+    const data = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
     };
 
-    for(var x = 0; x <50; x++){
-      testData.licNum = 'S1000000';
-      //ran = (Math.floor(Math.random() * 5000)+1);
-        testData.licNum = testData.licNum + x;
+    sha256(data.licNum)
+      .then(hash => {
+        data.licNum = hash;
 
-        sha256(testData.licNum)
-          .then(hash => {
-            testData.licNum = hash;
-          }
-        arrayObj[] = testData;
-        console.warn(arrayObj);
-    }
-    //Need to set up new test... will only be size of max set above
+        return data;
+      })
+      .then(data => {
+        sha256(data.address).then(hash => {
+          data.address = hash;
+        });
+        return data;
+      })
+      .then(data => {
+        return bannedListStorage
+          .load({
+            key: data.licNum,
 
+            // autoSync (default: true) means if data is not found or has expired,
+            // then invoke the corresponding sync method
+            autoSync: true,
 
+            // syncInBackground (default: true) means if data expired,
+            // return the outdated data first while invoking the sync method.
+            // If syncInBackground is set to false, and there is expired data,
+            // it will wait for the new data and return only after the sync completed.
+            // (This, of course, is slower)
+            syncInBackground: true,
+
+            // you can pass extra params to the sync method
+            // see sync example below
+            syncParams: {
+              extraFetchOptions: {
+                // blahblah
+              },
+              someFlag: true
+            }
+          })
+          .then(ret => {
+            // found data go to then()
+            alert("guest is banned");
+          })
+          .catch(err => {
+            // any exception including data not found
+            // goes to catch()
+            console.warn(err.message);
+            switch (err.name) {
+              case "NotFoundError":
+                alert("Not Found");
+            }
+          });
+      });
+
+    //console.warn(bannedListStorage);
   }
+
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
+    //var guestIsBanned = bannedCheck();
+
+    do {
+      const data = {
+        licNum: this.state.licNum,
+        dob: this.state.dob,
+        fName: this.state.fName,
+        lName: this.state.lName,
+        address: this.state.address,
+        town: this.state.town,
+        st8: this.state.st8,
+        gndr: this.state.gndr
+      };
+
+      sha256(data.licNum)
+        .then(hash => {
+          data.licNum = hash;
+
+          return data;
+        })
+        .then(data => {
+          sha256(data.address).then(hash => {
+            data.address = hash;
+          });
+          return data;
+        })
+
+        .then(data => {
+          return bannedListStorage
+            .load({
+              key: data.licNum,
+
+              // autoSync (default: true) means if data is not found or has expired,
+              // then invoke the corresponding sync method
+              autoSync: true,
+
+              // syncInBackground (default: true) means if data expired,
+              // return the outdated data first while invoking the sync method.
+              // If syncInBackground is set to false, and there is expired data,
+              // it will wait for the new data and return only after the sync completed.
+              // (This, of course, is slower)
+              syncInBackground: true,
+
+              // you can pass extra params to the sync method
+              // see sync example below
+              syncParams: {
+                extraFetchOptions: {
+                  // blahblah
+                },
+                someFlag: true
+              }
+            })
+            .then(ret => {
+              // found banned guest
+              showMessage({
+                message: "Banned Guest",
+                description: "This Person is Banned from Attending this Event",
+                duration: 3000,
+                type: "info",
+                backgroundColor: "black"
+              });
+              return true;
+            })
+
+            .catch(err => {
+              // any exception including data not found
+              // goes to catch()
+              console.warn(err.message);
+              switch (err.name) {
+                case "NotFoundError":
+                  // TODO;
+                  break;
+                case "ExpiredError":
+                  // TODO
+                  console.warn("here");
+                  break;
+              }
+              return false;
+            });
+        });
+      break;
+    } while (true);
+
+    /*if (guestIsBanned == true) {
+      bannedCheck();
+    } else {*/
 
     const dataStored = {
       licNum: this.state.licNum,
@@ -135,6 +469,7 @@ export default class App extends Component<Props> {
         });
         return dataStored;
       })
+
       .then(dataStored => {
         return storage.load({
           // same dynamic key
@@ -160,6 +495,7 @@ export default class App extends Component<Props> {
           }
         });
       })
+
       .then(ret => {
         // found data go to then()
         showMessage({
@@ -211,268 +547,226 @@ export default class App extends Component<Props> {
               });
             }
 
+            this.setState({
+              licNum: "",
+              dob: "",
+              fName: "",
+              lName: "",
+              address: "",
+              town: "",
+              st8: "",
+              gndr: ""
+            });
+
             break;
           case "ExpiredError":
             // TODO
             break;
         }
       });
-
+    //}
     // Resets the input boxes to empty after the submission
     // Taken out right now for test demonstration
-    /*	this.setState({licNum: "",
-										dob: "",
-										fName: "",
-										lName: "",
-										address: "",
-										town: "",
-										st8: "",
-										gndr: ""
-											})*/
+    /*this.setState({
+      licNum: "",
+      dob: "",
+      fName: "",
+      lName: "",
+      address: "",
+      town: "",
+      st8: "",
+      gndr: ""
+    });*/
+    console.warn(storage);
   }
 
   render() {
     return (
       <ScrollView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            margin: 10,
-            alignItems: "center"
-          }}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "powderblue",
-              margin: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          />
-          <View style={{ flex: 1, backgroundColor: "skyblue" }} />
-
-          <View style={{ flex: 1, backgroundColor: "steelblue" }} />
+        <View style={styles.container}>
           <Text style={styles.welcome}>EManage</Text>
           <Text style={styles.instructions}>
             Please Enter the Following Data
           </Text>
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+        </View>
+        <View style={[styles.card1, { backgroundColor: "#F9F7F6" }]}>
+          <Kaede
+            style={styles.input}
+            label={"License Number"}
             onChangeText={licNum => this.setState({ licNum })}
             value={this.state.licNum}
-            placeholder="License Number"
             returnKeyType="next"
+            blurOnSubmit={false}
             onSubmitEditing={() => {
               this.dateInput.focus();
             }}
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"MM/DD/YYYY"}
             onChangeText={dob => this.setState({ dob })}
             value={this.state.dob}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.dateInput = input)}
             onSubmitEditing={() => {
               this.firstNameInput.focus();
             }}
-            placeholder="MM/DD/YYYY"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"First Name"}
             onChangeText={fName => this.setState({ fName })}
             value={this.state.fName}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.firstNameInput = input)}
             onSubmitEditing={() => {
               this.lastNameInput.focus();
             }}
-            placeholder="First Name"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"Last Name"}
             onChangeText={lName => this.setState({ lName })}
             value={this.state.lName}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.lastNameInput = input)}
             onSubmitEditing={() => {
               this.addressInput.focus();
             }}
-            placeholder="Last Name"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"Address"}
             onChangeText={address => this.setState({ address })}
             value={this.state.address}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.addressInput = input)}
             onSubmitEditing={() => {
               this.townInput.focus();
             }}
-            placeholder="Address"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"Town"}
             onChangeText={town => this.setState({ town })}
             value={this.state.town}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.townInput = input)}
             onSubmitEditing={() => {
               this.st8Input.focus();
             }}
-            placeholder="Town"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 50,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"State"}
             onChangeText={st8 => this.setState({ st8 })}
             value={this.state.st8}
             returnKeyType="next"
+            blurOnSubmit={false}
             ref={input => (this.st8Input = input)}
             onSubmitEditing={() => {
               this.genderInput.focus();
             }}
-            placeholder="State"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
-
-          <TextInput
-            style={{
-              height: 40,
-              width: 100,
-              margin: 10,
-              borderColor: "gray",
-              borderWidth: 2
-            }}
-            style={{
-              height: 40,
-              width: "59%",
-              borderColor: "gray",
-              borderWidth: 2,
-              textAlign: "center"
-            }}
+          <Kaede
+            style={styles.input}
+            label={"Gender"}
             onChangeText={gndr => this.setState({ gndr })}
             value={this.state.gndr}
             returnKeyType="go"
+            blurOnSubmit={true}
             ref={input => (this.genderInput = input)}
-            placeholder="Gender"
-            placeholderTextColor="black"
+            labelStyle={{
+              color: "white",
+              backgroundColor: "#8e202f"
+            }}
+            inputStyle={{
+              color: "white",
+              backgroundColor: "#02004f"
+            }}
           />
+
           <View
-            style={[{ width: "59%", margin: 10, backgroundColor: "purple" }]}
+            style={[
+              {
+                margin: 10
+              }
+            ]}
           >
             <Button
               onPress={this.onPressEnterData.bind(this)}
               title="Submit"
-              color="purple"
+              color="#2aaf37"
             />
             <Button
               onPress={this.onPressTest.bind(this)}
               title="Test"
+              color="purple"
+            />
+            <Button
+              onPress={this.onPressTest2.bind(this)}
+              title="Test2"
               color="purple"
             />
           </View>
@@ -486,19 +780,28 @@ export default class App extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin: 10,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
+    alignItems: "center"
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 25,
+    color: "black",
     textAlign: "center",
     margin: 10
   },
   instructions: {
+    fontSize: 15,
     textAlign: "center",
     color: "#333333",
-    marginBottom: 5
+    marginBottom: 1
+  },
+  card1: {
+    paddingVertical: 8
+  },
+  input: {
+    marginTop: 2,
+    textAlign: "center"
   }
 });
 //needed since we are not using create-react-native-app
