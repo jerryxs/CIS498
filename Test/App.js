@@ -63,16 +63,15 @@ export default class App extends Component<Props> {
 
     this.socket = io("http://172.18.6.109:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
-      console.warn("No Banned List detected!");
+      //alert("No Banned List detected!");
     });
     this.socket.on(
       "gotBannedList",
       listData => {
         var bannedList = listData.bannedGuestList;
-        //console.warn(bannedList.length);
 
-        bannedList.forEach(bannedGuest => {
-          console.warn(bannedGuest);
+        /*bannedList.forEach(bannedGuest => {
+          //console.warn(bannedGuest);
           sha256(bannedGuest.licNum)
             .then(hash => {
               bannedGuest.licNum = hash;
@@ -88,9 +87,9 @@ export default class App extends Component<Props> {
               // I want to do this in each index of my array...
               bannedGuestObj.push(bannedGuest);
             });
-        });
-      },
-      console.warn("Banned Guest Obj" + bannedGuestObj)
+        });*/
+      }
+      //console.warn("Banned Guest Obj" + bannedGuestObj)
     );
 
     this.socket.on("needGuestList", data => {
@@ -215,7 +214,7 @@ export default class App extends Component<Props> {
         return getProperty(dataStored.licNum);
       })
       .then(ret => {
-        alert("Guest Banned");
+        //alert("Guest Banned");
       });
 
     sha256(dataStored.licNum)
