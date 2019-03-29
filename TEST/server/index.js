@@ -7,6 +7,7 @@ var fs = require("fs");
 var path = require("path");
 var ObjectsToCsv = require("objects-to-csv");
 const csv = require("csvtojson");
+const crypto = require("crypto");
 var arr = [];
 var bannedList = [];
 
@@ -81,28 +82,42 @@ io.on("connection", function(socket) {
   if (fs.existsSync("./server/fileupload/test.csv")) {
     csv()
       .fromFile("./test.csv")
-      .then(bannedGuestList => {
-        socket.emit("gotBannedList", { bannedGuestList });
-        console.log(bannedGuestList);
+      .then(jsonObj => {
+        jsonObj.forEach(index => {
+          var hashLic = crypto
+            .createHash("sha256")
+            .update(index.licNum)
+            .digest("base64");
+          //console.log(index);
+
+          var hashAdd = crypto
+            .createHash("sha256")
+            .update(index.address)
+            .digest("base64");
+          //console.log(index);
+
+          index.licNum = hashLic;
+          index.address = hashAdd;
+          //console.log(index);
+        });
+        socket.emit("gotBannedList", { jsonObj });
+        console.log(jsonObj);
       });
   } else {
     socket.emit("noBannedList");
   }
 
-  function submitPressed() {
-    var guestList = [];
-    socket.on("onPressEnterData", data => {
-      console.log("Client Message: ");
-      console.log(data.dataStored);
+  var guestList = [];
+  socket.on("onPressEnterData", data => {
+    console.log("Client Message: ");
+    console.log(data.dataStored);
 
-      socket.broadcast.emit("receiveUserData", { data });
+    socket.broadcast.emit("receiveUserData", { data });
 
-      guestList.push(data.dataStored);
-      new ObjectsToCsv(guestList).toDisk("./guests.csv", { append: true });
-      guestList.pop(data.dataStored);
-    });
-    return guestList;
-  }
+    guestList.push(data.dataStored);
+    new ObjectsToCsv(guestList).toDisk("./guests.csv", { append: true });
+    guestList.pop(data.dataStored);
+  });
 
   if (fs.existsSync("./guests.csv")) {
     csv()

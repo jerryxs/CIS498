@@ -61,41 +61,25 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.6.109:8000"); // connects to the local server
+    this.socket = io("http://172.18.13.46:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
-    this.socket.on(
-      "gotBannedList",
-      listData => {
-        var bannedList = listData.bannedGuestList;
-        //console.warn(bannedList.length);
+    this.socket.on("gotBannedList", listData => {
+      var bannedList = listData.jsonObj;
+      //console.warn(bannedList.length);
+      //console.warn(bannedList);
+      bannedList.forEach(bannedGuest => {
+        bannedGuestObj = bannedGuest;
+      });
+      //console.warn(bannedGuestObj);
 
-        bannedList.forEach(bannedGuest => {
-          console.warn(bannedGuest);
-          sha256(bannedGuest.licNum)
-            .then(hash => {
-              bannedGuest.licNum = hash;
-              return bannedGuest;
-            })
-            .then(bannedGuest => {
-              sha256(bannedGuest.address).then(hash => {
-                bannedGuest.address = hash;
-              });
-              return bannedGuest;
-            })
-            .then(bannedGuest => {
-              // I want to do this in each index of my array...
-              bannedGuestObj.push(bannedGuest);
-            });
-        });
-      },
-      console.warn("Banned Guest Obj" + bannedGuestObj)
-    );
+      //console.warn("Banned Guest Obj" + bannedGuestObj)
+    });
 
     this.socket.on("needGuestList", data => {
       var guestList = data.jsonObj;
-      console.warn(guestList);
+      //console.warn(guestList);
 
       guestList.forEach(guest => {
         storage.save({
@@ -109,7 +93,7 @@ export default class App extends Component<Props> {
         });
       });
 
-      console.warn(storage);
+      // console.warn(storage);
     });
 
     // Use this area to listen to signals from server and do something...
@@ -215,7 +199,7 @@ export default class App extends Component<Props> {
         return getProperty(dataStored.licNum);
       })
       .then(ret => {
-        alert("Guest Banned");
+        //alert("Guest Banned");
       });
 
     sha256(dataStored.licNum)
@@ -518,16 +502,6 @@ export default class App extends Component<Props> {
               onPress={this.onPressEnterData.bind(this)}
               title="Submit"
               color="#2aaf37"
-            />
-            <Button
-              onPress={this.onPressTest.bind(this)}
-              title="Test"
-              color="purple"
-            />
-            <Button
-              onPress={this.onPressTest2.bind(this)}
-              title="Test2"
-              color="purple"
             />
           </View>
         </View>
