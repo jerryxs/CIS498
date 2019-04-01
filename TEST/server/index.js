@@ -12,7 +12,7 @@ var arr = [];
 var bannedList = [];
 const dir = "/fileUpload";
 const dt = new Date();
-var eventDate = (dt.getMonth() + 1) + "_" + dt.getDate() +"_"+ dt.getFullYear();
+var eventDate = dt.getMonth() + 1 + "_" + dt.getDate() + "_" + dt.getFullYear();
 
 server.listen(8000);
 
@@ -107,11 +107,13 @@ io.on("connection", function(socket) {
     socket.broadcast.emit("receiveUserData", { data });
 
     guestList.push(data.dataStored);
-    new ObjectsToCsv(guestList).toDisk("./guestList_" + eventDate + ".csv", { append: true });
+    new ObjectsToCsv(guestList).toDisk("./guestList_" + eventDate + ".csv", {
+      append: true
+    });
     guestList.pop(data.dataStored);
   });
 
-  if (fs.existsSync("./guestList" + eventDate + ".csv")) {
+  if (fs.existsSync("./guestList_" + eventDate + ".csv")) {
     csv()
       .fromFile("./guestList" + eventDate + ".csv")
       .then(jsonObj => {
