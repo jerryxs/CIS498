@@ -9,15 +9,15 @@ import {
   Text,
   ScrollView,
   View,
-  InteractionManager,
-  PermissionsAndroid
+  Dimensions
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
-import { RNCamera } from "react-native-camera";
+import Camera from "react-native-camera";
+import { isAbsolute } from "path";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -62,7 +62,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.18.242:8000"); // connects to the local server
+    this.socket = io("http://134.88.129.16:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -508,7 +508,8 @@ export default class App extends Component<Props> {
           <View
             style={[
               {
-                margin: 10
+                margin: 10,
+                marginBottom: 20
               }
             ]}
           >
@@ -518,12 +519,12 @@ export default class App extends Component<Props> {
               color="#2aaf37"
             />
           </View>
-          <RNCamera
-            ref={ref => {
-              this.camera = ref;
+          <Camera
+            ref={cam => {
+              this.camera = cam;
             }}
-            type={RNCamera.Constants.Type.back}
-            flashMode={RNCamera.Constants.FlashMode.on}
+            style={styles.preview}
+            aspect={Camera.constants.Aspect.fill}
             permissionDialogTitle={"Permission to use camera"}
             permissionDialogMessage={
               "We need your permission to use your camera phone"
@@ -554,6 +555,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 1
+  },
+  preview: {
+    flex: 1,
+    marginTop: 300,
+
+    justifyContent: "flex-end",
+    alignItems: "center",
+    height: 100,
+    width: Dimensions.get("window").width
   },
   card1: {
     paddingVertical: 8
