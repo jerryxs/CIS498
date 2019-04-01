@@ -178,7 +178,7 @@ export default class App extends Component<Props> {
 
       bannedGuestObj.forEach(bannedGuest => {
         if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
-          alert("Banned Guest");
+          alert("Banned Error");
         }
       });
     });
@@ -188,11 +188,7 @@ export default class App extends Component<Props> {
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
-
-    var getProperty = function(propertyName) {
-      return bannedGuestObj[propertyName];
-    };
-
+    var bannedFlag = false;
     const dataStored = {
       licNum: this.state.licNum,
       dob: this.state.dob,
@@ -218,29 +214,9 @@ export default class App extends Component<Props> {
       })
 
       .then(dataStored => {
-        return getProperty(dataStored.licNum);
-      })
-      .then(ret => {
-        //alert("Guest Banned");
-      });
-
-    sha256(dataStored.licNum)
-      .then(hash => {
-        dataStored.licNum = hash;
-
-        return dataStored;
-      })
-      .then(dataStored => {
-        sha256(dataStored.address).then(hash => {
-          dataStored.address = hash;
-        });
-        return dataStored;
-      })
-
-      .then(dataStored => {
         bannedGuestObj.forEach(bannedGuest => {
           if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
-            alert("Banned Checking works");
+            bannedFlag = true;
           }
         });
 
@@ -277,6 +253,23 @@ export default class App extends Component<Props> {
           type: "info",
           backgroundColor: "red"
         });
+        /*if (!bannedFlag) {
+          showMessage({
+            message: "Duplicate Warning!",
+            description: "Guest Has Already Entered The Event",
+            duration: 3000,
+            type: "info",
+            backgroundColor: "red"
+          });
+        } else {
+          showMessage({
+            message: "Banned Warning",
+            description: "Guest is Banned",
+            duration: 3000,
+            type: "info",
+            backgroundColor: "black"
+          });
+        }*/
       })
       .catch(err => {
         // any exception including data not found
@@ -284,51 +277,61 @@ export default class App extends Component<Props> {
         //console.warn(err.message);
         switch (err.name) {
           case "NotFoundError":
-            this.socket.emit("onPressEnterData", { dataStored });
-
-            storage.save({
-              // dynamic key
-              key: dataStored.licNum, // Note: Do not use underscore("_") in key!
-              data: dataStored,
-
-              // if expires not specified, the defaultExpires will be applied instead.
-              // if set to null, then it will never expire.
-              expires: 1000 * 3600
-            });
-
-            var today = new Date();
-            var birthDate = new Date(this.state.dob);
-            var age = today.getFullYear() - birthDate.getFullYear();
-            var m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
-            if (age >= 21) {
+            if (bannedFlag) {
               showMessage({
-                message: "21+ Guest Added to Event!",
-                type: "info",
+                message: "Banned Warning",
+                description: "Guest is Banned",
                 duration: 3000,
-                backgroundColor: "green"
+                type: "info",
+                backgroundColor: "black"
               });
             } else {
-              showMessage({
-                message: "Under 21 Guest Added to the Event!",
-                type: "info",
-                duration: 3000,
-                backgroundColor: "blue"
+              this.socket.emit("onPressEnterData", { dataStored });
+
+              storage.save({
+                // dynamic key
+                key: dataStored.licNum, // Note: Do not use underscore("_") in key!
+                data: dataStored,
+
+                // if expires not specified, the defaultExpires will be applied instead.
+                // if set to null, then it will never expire.
+                expires: 1000 * 3600
+              });
+
+              var today = new Date();
+              var birthDate = new Date(this.state.dob);
+              var age = today.getFullYear() - birthDate.getFullYear();
+              var m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+              if (age >= 21) {
+                showMessage({
+                  message: "21+ Guest Added to Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "green"
+                });
+              } else {
+                showMessage({
+                  message: "Under 21 Guest Added to the Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "blue"
+                });
+              }
+
+              this.setState({
+                licNum: "",
+                dob: "",
+                fName: "",
+                lName: "",
+                address: "",
+                town: "",
+                st8: "",
+                gndr: ""
               });
             }
-
-            this.setState({
-              licNum: "",
-              dob: "",
-              fName: "",
-              lName: "",
-              address: "",
-              town: "",
-              st8: "",
-              gndr: ""
-            });
 
             break;
           case "ExpiredError":
