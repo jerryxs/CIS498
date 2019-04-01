@@ -11,14 +11,16 @@ const crypto = require("crypto");
 var arr = [];
 var bannedList = [];
 const dir = "/fileUpload";
+const dt = new Date();
+var eventDate = (dt.getMonth() + 1) + "_" + dt.getDate() +"_"+ dt.getFullYear();
 
 server.listen(8000);
 
 app.use(busboy());
 //app.use(express.static(path.join(__dirname, "public")));
 
-/* ========================================================== 
-Create a Route (/upload) to handle the Form submission 
+/* ==========================================================
+Create a Route (/upload) to handle the Form submission
 (handle POST requests to /upload)
 Express v4  Route definition
 ============================================================ */
@@ -105,13 +107,13 @@ io.on("connection", function(socket) {
     socket.broadcast.emit("receiveUserData", { data });
 
     guestList.push(data.dataStored);
-    new ObjectsToCsv(guestList).toDisk("./guests.csv", { append: true });
+    new ObjectsToCsv(guestList).toDisk("./guestList_" + eventDate + ".csv", { append: true });
     guestList.pop(data.dataStored);
   });
 
-  if (fs.existsSync("./guests.csv")) {
+  if (fs.existsSync("./guestList" + eventDate + ".csv")) {
     csv()
-      .fromFile("./guests.csv")
+      .fromFile("./guestList" + eventDate + ".csv")
       .then(jsonObj => {
         socket.emit("needGuestList", { jsonObj });
         console.log(jsonObj);
