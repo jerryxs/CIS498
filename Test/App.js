@@ -61,7 +61,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.13.46:8000"); // connects to the local server
+    this.socket = io("http://192.168.1.252:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       console.warn("No Banned List detected!");
     });
@@ -70,9 +70,9 @@ export default class App extends Component<Props> {
       //console.warn(bannedList.length);
       //console.warn(bannedList);
       bannedList.forEach(bannedGuest => {
-        bannedGuestObj = bannedGuest;
+        bannedGuestObj.push(bannedGuest);
       });
-      //console.warn(bannedGuestObj);
+      console.warn(bannedGuestObj);
 
       //console.warn("Banned Guest Obj" + bannedGuestObj)
     });
@@ -113,7 +113,6 @@ export default class App extends Component<Props> {
   }
 
   onPressTest2() {
-    var arrayObj = [];
     var testData = {
       licNum: "1000000",
       dob: "12/04/1995",
@@ -162,7 +161,30 @@ export default class App extends Component<Props> {
     console.warn(arrayObj);
   }
 
-  onPressTest() {}
+  onPressTest() {
+    const dataStored = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
+    };
+
+    sha256(dataStored.licNum).then(hash => {
+      dataStored.licNum = hash;
+
+      bannedGuestObj.forEach(bannedGuest => {
+        if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
+          alert("Banned Guest");
+        }
+      });
+    });
+
+    //console.warn(bannedGuestObj);
+  }
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
@@ -216,6 +238,12 @@ export default class App extends Component<Props> {
       })
 
       .then(dataStored => {
+        bannedGuestObj.forEach(bannedGuest => {
+          if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
+            alert("Banned Checking works");
+          }
+        });
+
         return storage.load({
           // same dynamic key
           key: dataStored.licNum,
@@ -240,7 +268,6 @@ export default class App extends Component<Props> {
           }
         });
       })
-
       .then(ret => {
         // found data go to then()
         showMessage({
@@ -501,6 +528,11 @@ export default class App extends Component<Props> {
             <Button
               onPress={this.onPressEnterData.bind(this)}
               title="Submit"
+              color="#2aaf37"
+            />
+            <Button
+              onPress={this.onPressTest.bind(this)}
+              title="Test"
               color="#2aaf37"
             />
           </View>
