@@ -1,5 +1,5 @@
 {
-  "name": "TEST",
+  "name": "test",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "objects-to-csv": "^1.2.1",
     "react": "16.6.3",
     "react-native": "0.58.4",
+    "react-native-camera": "^2.2.0",
     "react-native-flash-message": "^0.1.10",
     "react-native-sha256": "^1.2.3",
     "react-native-socketio": "^0.3.0",
@@ -36,5 +37,9 @@
   },
   "jest": {
     "preset": "react-native"
-  }
+  },
+  "description": "INSTALL GUIDE",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
 }

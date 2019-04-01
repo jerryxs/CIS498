@@ -17,6 +17,7 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
+import { RNCamera } from "react-native-camera";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -61,9 +62,9 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://192.168.1.252:8000"); // connects to the local server
+    this.socket = io("http://172.18.18.242:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
-      //alert("No Banned List detected!");
+      alert("No Banned List detected!");
     });
     this.socket.on("gotBannedList", listData => {
       var bannedList = listData.jsonObj;
@@ -253,23 +254,6 @@ export default class App extends Component<Props> {
           type: "info",
           backgroundColor: "red"
         });
-        /*if (!bannedFlag) {
-          showMessage({
-            message: "Duplicate Warning!",
-            description: "Guest Has Already Entered The Event",
-            duration: 3000,
-            type: "info",
-            backgroundColor: "red"
-          });
-        } else {
-          showMessage({
-            message: "Banned Warning",
-            description: "Guest is Banned",
-            duration: 3000,
-            type: "info",
-            backgroundColor: "black"
-          });
-        }*/
       })
       .catch(err => {
         // any exception including data not found
@@ -533,12 +517,18 @@ export default class App extends Component<Props> {
               title="Submit"
               color="#2aaf37"
             />
-            <Button
-              onPress={this.onPressTest.bind(this)}
-              title="Test"
-              color="#2aaf37"
-            />
           </View>
+          <RNCamera
+            ref={ref => {
+              this.camera = ref;
+            }}
+            type={RNCamera.Constants.Type.back}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            permissionDialogTitle={"Permission to use camera"}
+            permissionDialogMessage={
+              "We need your permission to use your camera phone"
+            }
+          />
         </View>
         <FlashMessage position="top" />
       </ScrollView>
