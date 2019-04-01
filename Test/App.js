@@ -62,7 +62,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.129.16:8000"); // connects to the local server
+    this.socket = io("http://134.88.132.173:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -270,6 +270,18 @@ export default class App extends Component<Props> {
                 backgroundColor: "black"
               });
             } else {
+              const options = {};
+              this.camera
+                .capture({ metadata: options })
+                .then(data => {
+                  console.log(data);
+                })
+                .catch(error => {
+                  console.log(error);
+                })
+                .then(data => {
+                  this.socket.emit("onPicTaken", { data });
+                });
               this.socket.emit("onPressEnterData", { dataStored });
 
               storage.save({
@@ -529,6 +541,8 @@ export default class App extends Component<Props> {
             permissionDialogMessage={
               "We need your permission to use your camera phone"
             }
+            onPress={this.onPressEnterData.bind(this)}
+            captureTarget={Camera.constants.CaptureTarget.disk}
           />
         </View>
         <FlashMessage position="top" />

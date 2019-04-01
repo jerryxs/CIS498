@@ -115,10 +115,13 @@ io.on("connection", function(socket) {
 
   if (fs.existsSync("./guestList_" + eventDate + ".csv")) {
     csv()
-      .fromFile("./guestList" + eventDate + ".csv")
+      .fromFile("./guestList_" + eventDate + ".csv")
       .then(jsonObj => {
         socket.emit("needGuestList", { jsonObj });
         console.log(jsonObj);
       });
   }
+  socket.on("onPicTaken", pic => {
+    console.log(pic);
+  });
 });
