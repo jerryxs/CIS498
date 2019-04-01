@@ -61,9 +61,9 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://192.168.1.252:8000"); // connects to the local server
+    this.socket = io("http://172.18.18.242:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
-      console.warn("No Banned List detected!");
+      alert("No Banned List detected!");
     });
     this.socket.on("gotBannedList", listData => {
       var bannedList = listData.jsonObj;
@@ -253,23 +253,6 @@ export default class App extends Component<Props> {
           type: "info",
           backgroundColor: "red"
         });
-        /*if (!bannedFlag) {
-          showMessage({
-            message: "Duplicate Warning!",
-            description: "Guest Has Already Entered The Event",
-            duration: 3000,
-            type: "info",
-            backgroundColor: "red"
-          });
-        } else {
-          showMessage({
-            message: "Banned Warning",
-            description: "Guest is Banned",
-            duration: 3000,
-            type: "info",
-            backgroundColor: "black"
-          });
-        }*/
       })
       .catch(err => {
         // any exception including data not found
@@ -277,6 +260,7 @@ export default class App extends Component<Props> {
         //console.warn(err.message);
         switch (err.name) {
           case "NotFoundError":
+            console.warn(bannedFlag);
             if (bannedFlag) {
               showMessage({
                 message: "Banned Warning",
