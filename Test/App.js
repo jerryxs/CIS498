@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Dimensions } from "react";
 import {
   AppRegistry,
   Button,
@@ -17,7 +17,7 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
-import { RNCamera } from "react-native-camera";
+import Camera from "react-native-camera";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -517,18 +517,18 @@ export default class App extends Component<Props> {
               title="Submit"
               color="#2aaf37"
             />
+            <Camera
+              ref={cam => {
+                this.camera = cam;
+              }}
+              style={styles.preview}
+              aspect={Camera.constants.Aspect.fill}
+              permissionDialogTitle={"Permission to use camera"}
+              permissionDialogMessage={
+                "We need your permission to use your camera phone"
+              }
+            />
           </View>
-          <RNCamera
-            ref={ref => {
-              this.camera = ref;
-            }}
-            type={RNCamera.Constants.Type.back}
-            flashMode={RNCamera.Constants.FlashMode.on}
-            permissionDialogTitle={"Permission to use camera"}
-            permissionDialogMessage={
-              "We need your permission to use your camera phone"
-            }
-          />
         </View>
         <FlashMessage position="top" />
       </ScrollView>
@@ -554,6 +554,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 1
+  },
+  preview: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    height: 100,
+    width: 100
   },
   card1: {
     paddingVertical: 8
