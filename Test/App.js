@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Dimensions } from "react";
 import {
   AppRegistry,
   Button,
@@ -17,6 +17,7 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
+import Camera from "react-native-camera";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
@@ -61,41 +62,25 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://172.18.6.109:8000"); // connects to the local server
+    this.socket = io("http://172.18.18.242:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
-      console.warn("No Banned List detected!");
+      alert("No Banned List detected!");
     });
-    this.socket.on(
-      "gotBannedList",
-      listData => {
-        var bannedList = listData.bannedGuestList;
-        //console.warn(bannedList.length);
+    this.socket.on("gotBannedList", listData => {
+      var bannedList = listData.jsonObj;
+      //console.warn(bannedList.length);
+      //console.warn(bannedList);
+      bannedList.forEach(bannedGuest => {
+        bannedGuestObj.push(bannedGuest);
+      });
+      console.warn(bannedGuestObj);
 
-        bannedList.forEach(bannedGuest => {
-          console.warn(bannedGuest);
-          sha256(bannedGuest.licNum)
-            .then(hash => {
-              bannedGuest.licNum = hash;
-              return bannedGuest;
-            })
-            .then(bannedGuest => {
-              sha256(bannedGuest.address).then(hash => {
-                bannedGuest.address = hash;
-              });
-              return bannedGuest;
-            })
-            .then(bannedGuest => {
-              // I want to do this in each index of my array...
-              bannedGuestObj.push(bannedGuest);
-            });
-        });
-      },
-      console.warn("Banned Guest Obj" + bannedGuestObj)
-    );
+      //console.warn("Banned Guest Obj" + bannedGuestObj)
+    });
 
     this.socket.on("needGuestList", data => {
       var guestList = data.jsonObj;
-      console.warn(guestList);
+      //console.warn(guestList);
 
       guestList.forEach(guest => {
         storage.save({
@@ -109,7 +94,7 @@ export default class App extends Component<Props> {
         });
       });
 
-      console.warn(storage);
+      // console.warn(storage);
     });
 
     // Use this area to listen to signals from server and do something...
@@ -129,7 +114,6 @@ export default class App extends Component<Props> {
   }
 
   onPressTest2() {
-    var arrayObj = [];
     var testData = {
       licNum: "1000000",
       dob: "12/04/1995",
@@ -178,15 +162,34 @@ export default class App extends Component<Props> {
     console.warn(arrayObj);
   }
 
-  onPressTest() {}
+  onPressTest() {
+    const dataStored = {
+      licNum: this.state.licNum,
+      dob: this.state.dob,
+      fName: this.state.fName,
+      lName: this.state.lName,
+      address: this.state.address,
+      town: this.state.town,
+      st8: this.state.st8,
+      gndr: this.state.gndr
+    };
+
+    sha256(dataStored.licNum).then(hash => {
+      dataStored.licNum = hash;
+
+      bannedGuestObj.forEach(bannedGuest => {
+        if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
+          alert("Banned Error");
+        }
+      });
+    });
+
+    //console.warn(bannedGuestObj);
+  }
   //Function for submit button
   onPressEnterData() {
     //When submit is pressed, an array is populated with the new state of each input box
-
-    var getProperty = function(propertyName) {
-      return bannedGuestObj[propertyName];
-    };
-
+    var bannedFlag = false;
     const dataStored = {
       licNum: this.state.licNum,
       dob: this.state.dob,
@@ -212,26 +215,12 @@ export default class App extends Component<Props> {
       })
 
       .then(dataStored => {
-        return getProperty(dataStored.licNum);
-      })
-      .then(ret => {
-        alert("Guest Banned");
-      });
-
-    sha256(dataStored.licNum)
-      .then(hash => {
-        dataStored.licNum = hash;
-
-        return dataStored;
-      })
-      .then(dataStored => {
-        sha256(dataStored.address).then(hash => {
-          dataStored.address = hash;
+        bannedGuestObj.forEach(bannedGuest => {
+          if (Object.values(bannedGuest).indexOf(dataStored.licNum) > -1) {
+            bannedFlag = true;
+          }
         });
-        return dataStored;
-      })
 
-      .then(dataStored => {
         return storage.load({
           // same dynamic key
           key: dataStored.licNum,
@@ -256,7 +245,6 @@ export default class App extends Component<Props> {
           }
         });
       })
-
       .then(ret => {
         // found data go to then()
         showMessage({
@@ -273,51 +261,61 @@ export default class App extends Component<Props> {
         //console.warn(err.message);
         switch (err.name) {
           case "NotFoundError":
-            this.socket.emit("onPressEnterData", { dataStored });
-
-            storage.save({
-              // dynamic key
-              key: dataStored.licNum, // Note: Do not use underscore("_") in key!
-              data: dataStored,
-
-              // if expires not specified, the defaultExpires will be applied instead.
-              // if set to null, then it will never expire.
-              expires: 1000 * 3600
-            });
-
-            var today = new Date();
-            var birthDate = new Date(this.state.dob);
-            var age = today.getFullYear() - birthDate.getFullYear();
-            var m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
-            if (age >= 21) {
+            if (bannedFlag) {
               showMessage({
-                message: "21+ Guest Added to Event!",
-                type: "info",
+                message: "Banned Warning",
+                description: "Guest is Banned",
                 duration: 3000,
-                backgroundColor: "green"
+                type: "info",
+                backgroundColor: "black"
               });
             } else {
-              showMessage({
-                message: "Under 21 Guest Added to the Event!",
-                type: "info",
-                duration: 3000,
-                backgroundColor: "blue"
+              this.socket.emit("onPressEnterData", { dataStored });
+
+              storage.save({
+                // dynamic key
+                key: dataStored.licNum, // Note: Do not use underscore("_") in key!
+                data: dataStored,
+
+                // if expires not specified, the defaultExpires will be applied instead.
+                // if set to null, then it will never expire.
+                expires: 1000 * 3600
+              });
+
+              var today = new Date();
+              var birthDate = new Date(this.state.dob);
+              var age = today.getFullYear() - birthDate.getFullYear();
+              var m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+              if (age >= 21) {
+                showMessage({
+                  message: "21+ Guest Added to Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "green"
+                });
+              } else {
+                showMessage({
+                  message: "Under 21 Guest Added to the Event!",
+                  type: "info",
+                  duration: 3000,
+                  backgroundColor: "blue"
+                });
+              }
+
+              this.setState({
+                licNum: "",
+                dob: "",
+                fName: "",
+                lName: "",
+                address: "",
+                town: "",
+                st8: "",
+                gndr: ""
               });
             }
-
-            this.setState({
-              licNum: "",
-              dob: "",
-              fName: "",
-              lName: "",
-              address: "",
-              town: "",
-              st8: "",
-              gndr: ""
-            });
 
             break;
           case "ExpiredError":
@@ -519,15 +517,16 @@ export default class App extends Component<Props> {
               title="Submit"
               color="#2aaf37"
             />
-            <Button
-              onPress={this.onPressTest.bind(this)}
-              title="Test"
-              color="purple"
-            />
-            <Button
-              onPress={this.onPressTest2.bind(this)}
-              title="Test2"
-              color="purple"
+            <Camera
+              ref={cam => {
+                this.camera = cam;
+              }}
+              style={styles.preview}
+              aspect={Camera.constants.Aspect.fill}
+              permissionDialogTitle={"Permission to use camera"}
+              permissionDialogMessage={
+                "We need your permission to use your camera phone"
+              }
             />
           </View>
         </View>
@@ -555,6 +554,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333333",
     marginBottom: 1
+  },
+  preview: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    height: 100,
+    width: 100
   },
   card1: {
     paddingVertical: 8

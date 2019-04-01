@@ -1,5 +1,5 @@
 {
-  "name": "TEST",
+  "name": "test",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "busboy": "^0.3.0",
     "connect-busboy": "0.0.2",
     "convert-csv-to-json": "0.0.13",
+    "crypto": "^1.0.1",
     "csvtojson": "^2.0.8",
     "express": "^4.16.4",
     "express-fileupload": "^1.1.1-alpha.3",
@@ -18,6 +19,7 @@
     "objects-to-csv": "^1.2.1",
     "react": "16.6.3",
     "react-native": "0.58.4",
+    "react-native-camera": "^2.2.0",
     "react-native-flash-message": "^0.1.10",
     "react-native-sha256": "^1.2.3",
     "react-native-socketio": "^0.3.0",
@@ -35,5 +37,9 @@
   },
   "jest": {
     "preset": "react-native"
-  }
+  },
+  "description": "INSTALL GUIDE",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
 }
