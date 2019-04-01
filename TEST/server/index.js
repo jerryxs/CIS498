@@ -87,13 +87,13 @@ io.on("connection", function(socket) {
           var hashLic = crypto
             .createHash("sha256")
             .update(index.licNum)
-            .digest("base64");
+            .digest("hex");
           //console.log(index);
 
           var hashAdd = crypto
             .createHash("sha256")
             .update(index.address)
-            .digest("base64");
+            .digest("hex");
           //console.log(index);
 
           index.licNum = hashLic;
@@ -101,6 +101,7 @@ io.on("connection", function(socket) {
           //console.log(index);
         });
         socket.emit("gotBannedList", { jsonObj });
+        console.log("Banned List: ");
         console.log(jsonObj);
       });
   } else {
