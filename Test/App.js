@@ -281,7 +281,10 @@ export default class App extends Component<Props> {
               this.camera
                 .capture({ metadata: options })
                 .then(data => {
-                  this.socket.emit("onPicTaken", { data });
+                  this.socket.emit("onPicTaken", {
+                    image: true,
+                    buffer: data.toString("base64")
+                  });
                 })
                 .catch(error => {
                   console.log(error);
