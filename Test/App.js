@@ -254,6 +254,7 @@ export default class App extends Component<Props> {
       })
       .then(ret => {
         // found data go to then()
+        this.refs.scrollView.scrollTo({ y: 0 });
         showMessage({
           message: "Duplicate Warning!",
           description: "Guest Has Already Entered The Event",
@@ -289,6 +290,7 @@ export default class App extends Component<Props> {
                 .catch(error => {
                   console.log(error);
                 });
+              this.refs.scrollView.scrollTo(0);
 
               this.socket.emit("onPressEnterData", { dataStored });
 
@@ -360,7 +362,7 @@ export default class App extends Component<Props> {
 
   render() {
     return (
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} ref="scrollView">
         <View style={styles.container}>
           <Text style={styles.welcome}>EManage</Text>
           <Text style={styles.instructions}>
