@@ -21,6 +21,7 @@
     "react": "16.6.3",
     "react-native": "0.58.4",
     "react-native-camera": "^2.2.0",
+    "react-native-dimension": "^1.0.6",
     "react-native-flash-message": "^0.1.10",
     "react-native-sha256": "^1.2.3",
     "react-native-socketio": "^0.3.0",

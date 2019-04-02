@@ -62,7 +62,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.129.16:8000"); // connects to the local server
+    this.socket = io("http://134.88.131.65:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -558,11 +558,10 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    marginTop: 300,
-
+    paddingVertical: 8,
     justifyContent: "flex-end",
     alignItems: "center",
-    height: 100,
+    height: Dimensions.get("window").height,
     width: Dimensions.get("window").width
   },
   card1: {
