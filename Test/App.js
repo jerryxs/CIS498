@@ -573,11 +573,10 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    marginTop: 300,
-
+    paddingVertical: 8,
     justifyContent: "flex-end",
     alignItems: "center",
-    height: 100,
+    height: Dimensions.get("window").height,
     width: Dimensions.get("window").width
   },
   card1: {
