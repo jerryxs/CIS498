@@ -10,7 +10,8 @@ import {
   ScrollView,
   View,
   Dimensions,
-  PermissionsAndroid
+  PermissionsAndroid,
+  requestMultiple
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
@@ -21,10 +22,13 @@ import Camera from "react-native-camera";
 import { isAbsolute } from "path";
 //import DeviceInfo from 'react-native-device-info';
 
-//console.disableYellowBox = true;
+//PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
 PermissionsAndroid.request(
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
 );
+
+//console.disableYellowBox = true;
+
 const storage = new Storage({
   // maximum capacity, default 1000
   size: 500000,
@@ -521,7 +525,8 @@ export default class App extends Component<Props> {
           <View
             style={[
               {
-                marginTop: 2
+                marginTop: 2,
+                marginBottom: 2
               }
             ]}
           >
@@ -542,7 +547,6 @@ export default class App extends Component<Props> {
               "We need your permission to use your camera phone"
             }
             onPress={this.onPressEnterData.bind(this)}
-            captureTarget={Camera.constants.CaptureTarget.disk}
           />
         </View>
         <FlashMessage position="top" />
@@ -572,7 +576,7 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    marginTop: 10,
+    marginTop: 25,
     justifyContent: "flex-end",
     alignItems: "center",
     height: Dimensions.get("window").height,
