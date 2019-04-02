@@ -9,7 +9,8 @@ import {
   Text,
   ScrollView,
   View,
-  Dimensions
+  Dimensions,
+  PermissionsAndroid
 } from "react-native";
 import { sha256 } from "react-native-sha256";
 import io from "socket.io-client/dist/socket.io";
@@ -21,7 +22,9 @@ import { isAbsolute } from "path";
 //import DeviceInfo from 'react-native-device-info';
 
 //console.disableYellowBox = true;
-
+PermissionsAndroid.request(
+  PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+);
 const storage = new Storage({
   // maximum capacity, default 1000
   size: 500000,
@@ -274,7 +277,7 @@ export default class App extends Component<Props> {
               this.camera
                 .capture({ metadata: options })
                 .then(data => {
-                  console.log(data);
+                  console.warn(data);
                 })
                 .catch(error => {
                   console.log(error);
