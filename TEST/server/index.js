@@ -122,6 +122,7 @@ io.on("connection", function(socket) {
       });
   }
   socket.on("onPicTaken", pic => {
+    console.log("Received Pic");
     console.log(pic);
   });
 });
