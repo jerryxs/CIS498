@@ -521,8 +521,7 @@ export default class App extends Component<Props> {
           <View
             style={[
               {
-                margin: 10,
-                marginBottom: 20
+                marginTop: 2
               }
             ]}
           >
@@ -573,7 +572,7 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    paddingVertical: 8,
+    marginTop: 10,
     justifyContent: "flex-end",
     alignItems: "center",
     height: Dimensions.get("window").height,
