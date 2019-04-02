@@ -290,7 +290,7 @@ export default class App extends Component<Props> {
                 .catch(error => {
                   console.log(error);
                 });
-              this.refs.scrollView.scrollTo(0);
+              this.refs.scrollView.scrollTo({ y: 0 });
 
               this.socket.emit("onPressEnterData", { dataStored });
 
