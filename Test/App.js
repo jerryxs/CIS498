@@ -18,7 +18,7 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
-import Camera from "react-native-camera";
+import  Camera  from "react-native-camera";
 import { isAbsolute } from "path";
 //import DeviceInfo from 'react-native-device-info';
 
@@ -26,6 +26,8 @@ import { isAbsolute } from "path";
 PermissionsAndroid.request(
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
 );
+
+var PicturePath;
 
 //console.disableYellowBox = true;
 
@@ -51,6 +53,45 @@ const storage = new Storage({
 });
 
 var bannedGuestObj = [];
+function storePicture() {
+  console.warn(PicturePath);
+  if (PicturePath) {
+  
+    // Create the form data object
+    var data = new FormData();
+    data.append('picture', {
+      uri: PicturePath,
+      name: 'selfie.jpg',
+      type: 'image/jpg'
+    });
+
+    // Create the config object for the POST
+    // You typically have an OAuth2 token that you use for authentication
+    const config = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data;',
+      },
+      body: data
+    };
+
+    fetch('http://192.168.7.28:8000', config).then(responseData => {
+      // Log the response form the server
+      // Here we get what we sent to Postman back
+      console.warn(responseData);
+    }).catch(err => { console.log(err); });
+  }
+}
+
+takePicture = async function() {
+  if (this.camera) {
+    const options = { quality: 0.5, base64: true };
+    const data = await this.camera.takePictureAsync(options);
+    console.warn(data.uri);
+  }
+}
+
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -69,7 +110,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://134.88.132.173:8000"); // connects to the local server
+    this.socket = io("http://192.168.7.28:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -279,17 +320,13 @@ export default class App extends Component<Props> {
               });
             } else {
               const options = {};
-              this.camera
-                .capture({ metadata: options })
-                .then(data => {
-                  this.socket.emit("onPicTaken", {
-                    image: true,
-                    buffer: data.toString("base64")
-                  });
-                })
-                .catch(error => {
-                  console.log(error);
-                });
+              this.camera.capture({metadata: options})
+              .then((data) => {
+                PicturePath = data.path;
+                storePicture();
+              })
+              .catch(err => console.error(err));
+              
               this.refs.scrollView.scrollTo({ y: 0 });
 
               this.socket.emit("onPressEnterData", { dataStored });
@@ -551,6 +588,7 @@ export default class App extends Component<Props> {
             permissionDialogMessage={
               "We need your permission to use your camera phone"
             }
+            captureTarget={Camera.constants.CaptureTarget.disk}
             onPress={this.onPressEnterData.bind(this)}
           />
         </View>

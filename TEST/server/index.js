@@ -3,6 +3,8 @@ var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
+var multer = require('multer');
+var upload = multer({dest: 'server/pics'})
 var fs = require("fs");
 var path = require("path");
 var ObjectsToCsv = require("objects-to-csv");
@@ -17,6 +19,7 @@ var eventDate = dt.getMonth() + 1 + "_" + dt.getDate() + "_" + dt.getFullYear();
 server.listen(8000);
 
 app.use(busboy());
+
 //app.use(express.static(path.join(__dirname, "public")));
 
 /* ==========================================================
@@ -59,6 +62,11 @@ app.post("/upload", function(req, res) {
         });
     });
   });
+});
+
+app.post("/", upload.single('guestPicture'),(req, res) => {
+  console.log("Got Picture: ");
+  console.log(req.file);
 });
 
 app.get("/", function(req, res) {
