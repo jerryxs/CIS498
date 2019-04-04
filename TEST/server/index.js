@@ -3,16 +3,14 @@ var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
-var multer = require('multer');
-var upload = multer({dest: 'server/pics'})
+var multer = require("multer");
+var upload = multer({ dest: "server/pics" });
 var fs = require("fs");
 var path = require("path");
 var ObjectsToCsv = require("objects-to-csv");
 const csv = require("csvtojson");
 const crypto = require("crypto");
-var arr = [];
-var bannedList = [];
-const dir = "/fileUpload";
+const dir = "/fileUpload/";
 const dt = new Date();
 var eventDate = dt.getMonth() + 1 + "_" + dt.getDate() + "_" + dt.getFullYear();
 
@@ -20,20 +18,21 @@ server.listen(8000);
 
 app.use(busboy());
 
-//app.use(express.static(path.join(__dirname, "public")));
-
-/* ==========================================================
-Create a Route (/upload) to handle the Form submission
-(handle POST requests to /upload)
-Express v4  Route definition
-============================================================ */
 app.post("/upload", function(req, res) {
   var fstream;
   req.pipe(req.busboy);
   req.busboy.on("file", function(fieldname, file, filename) {
     console.log("Uploading: " + filename);
 
-    fstream = fs.createWriteStream(__dirname + "/" + filename);
+    if (!fs.existsSync("/server/fileUpload")) {
+      fs.mkdir("server/fileUpload", err => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+
+    fstream = fs.createWriteStream(__dirname + dir + filename);
 
     file.pipe(fstream);
     fstream.on("close", function() {
@@ -41,7 +40,7 @@ app.post("/upload", function(req, res) {
 
       res.redirect("back"); //where to go next
       csv()
-        .fromFile("./server/test.csv")
+        .fromFile("./server/fileUpload/test.csv")
         .then(jsonObj => {
           jsonObj.forEach(index => {
             var hashLic = crypto
@@ -64,7 +63,7 @@ app.post("/upload", function(req, res) {
   });
 });
 
-app.post("/", upload.single('guestPicture'),(req, res) => {
+app.post("/", upload.single("guestPicture"), (req, res) => {
   console.log("Got Picture: ");
   console.log(req.file);
 });
@@ -72,6 +71,22 @@ app.post("/", upload.single('guestPicture'),(req, res) => {
 app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
+
+if (!fs.existsSync("server/guestLists")) {
+  fs.mkdir("server/guestLists", err => {
+    if (err) {
+      console.log(err);
+    }
+  });
+}
+
+if (!fs.existsSync("server/pics")) {
+  fs.mkdir("server/pics", err => {
+    if (err) {
+      console.log(err);
+    }
+  });
+}
 
 // When devices connect to the server...
 io.on("connection", function(socket) {
@@ -129,8 +144,4 @@ io.on("connection", function(socket) {
         console.log(jsonObj);
       });
   }
-  socket.on("onPicTaken", pic => {
-    console.log("Received Pic");
-    console.log(pic.data.path);
-  });
 });
