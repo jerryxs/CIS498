@@ -18,7 +18,7 @@ import io from "socket.io-client/dist/socket.io";
 import FlashMessage, { showMessage } from "react-native-flash-message";
 import Storage from "react-native-storage";
 import { Kaede } from "react-native-textinput-effects";
-import  Camera  from "react-native-camera";
+import Camera from "react-native-camera";
 import { isAbsolute } from "path";
 //import DeviceInfo from 'react-native-device-info';
 
@@ -56,31 +56,30 @@ var bannedGuestObj = [];
 function storePicture() {
   console.warn(PicturePath);
   if (PicturePath) {
-  
     // Create the form data object
     var data = new FormData();
-    data.append('picture', {
+    data.append("guestPicture", {
       uri: PicturePath,
-      name: 'selfie.jpg',
-      type: 'image/jpg'
+      name: "guestPicture",
+      type: "image/jpg"
     });
 
     // Create the config object for the POST
     // You typically have an OAuth2 token that you use for authentication
     const config = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data;',
-      },
+      method: "POST",
       body: data
     };
 
-    fetch('http://192.168.7.28:8000', config).then(responseData => {
-      // Log the response form the server
-      // Here we get what we sent to Postman back
-      console.warn(responseData);
-    }).catch(err => { console.log(err); });
+    fetch("http://172.18.19.16:8000", config)
+      .then(responseData => {
+        // Log the response form the server
+        // Here we get what we sent to Postman back
+        console.warn(responseData);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 }
 
@@ -90,8 +89,7 @@ takePicture = async function() {
     const data = await this.camera.takePictureAsync(options);
     console.warn(data.uri);
   }
-}
-
+};
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -110,7 +108,7 @@ export default class App extends Component<Props> {
       gndr: ""
     };
 
-    this.socket = io("http://192.168.7.28:8000"); // connects to the local server
+    this.socket = io("http://172.18.19.16:8000"); // connects to the local server
     this.socket.on("noBannedList", () => {
       alert("No Banned List detected!");
     });
@@ -320,13 +318,14 @@ export default class App extends Component<Props> {
               });
             } else {
               const options = {};
-              this.camera.capture({metadata: options})
-              .then((data) => {
-                PicturePath = data.path;
-                storePicture();
-              })
-              .catch(err => console.error(err));
-              
+              this.camera
+                .capture({ metadata: options })
+                .then(data => {
+                  PicturePath = data.path;
+                  storePicture();
+                })
+                .catch(err => console.error(err));
+
               this.refs.scrollView.scrollTo({ y: 0 });
 
               this.socket.emit("onPressEnterData", { dataStored });

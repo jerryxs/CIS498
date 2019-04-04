@@ -65,6 +65,7 @@ app.post("/upload", function(req, res) {
 
 app.post("/", upload.single("guestPicture"), (req, res) => {
   console.log("Got Picture: ");
+  res.send("Complete");
   console.log(req.file);
 });
 
@@ -93,9 +94,9 @@ io.on("connection", function(socket) {
   // log the socket ID of the device
   console.log(socket.id);
 
-  if (fs.existsSync("./server/test.csv")) {
+  if (fs.existsSync("./server/fileUpload/test.csv")) {
     csv()
-      .fromFile("./server/test.csv")
+      .fromFile("./server/fileUpload/test.csv")
       .then(jsonObj => {
         jsonObj.forEach(index => {
           var hashLic = crypto
