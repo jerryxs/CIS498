@@ -83,14 +83,6 @@ function storePicture() {
   }
 }
 
-takePicture = async function() {
-  if (this.camera) {
-    const options = { quality: 0.5, base64: true };
-    const data = await this.camera.takePictureAsync(options);
-    console.warn(data.uri);
-  }
-};
-
 type Props = {};
 export default class App extends Component<Props> {
   //Add states for input boxes

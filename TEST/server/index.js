@@ -18,7 +18,7 @@ var path = require("path");
 var ObjectsToCsv = require("objects-to-csv");
 const csv = require("csvtojson");
 const crypto = require("crypto");
-const dir = "/fileUpload/";
+const dir = "/bannedGuestList/";
 const dt = new Date();
 var eventDate = dt.getMonth() + 1 + "_" + dt.getDate() + "_" + dt.getFullYear();
 
@@ -32,8 +32,8 @@ app.post("/upload", function(req, res) {
   req.busboy.on("file", function(fieldname, file, filename) {
     console.log("Uploading: " + filename);
 
-    if (!fs.existsSync("/server/fileUpload")) {
-      fs.mkdir("server/fileUpload", err => {
+    if (!fs.existsSync("/server/bannedGuestList")) {
+      fs.mkdir("server/bannedGuestList", err => {
         if (err) {
           console.log(err);
         }
@@ -48,7 +48,7 @@ app.post("/upload", function(req, res) {
 
       res.redirect("back"); //where to go next
       csv()
-        .fromFile("./server/fileUpload/test.csv")
+        .fromFile("./server/bannedGuestList/test.csv")
         .then(jsonObj => {
           jsonObj.forEach(index => {
             var hashLic = crypto
@@ -72,6 +72,13 @@ app.post("/upload", function(req, res) {
 });
 
 app.post("/", upload.single("guestPicture"), (req, res) => {
+  if (!fs.existsSync("server/pics")) {
+    fs.mkdir("server/pics", err => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
   console.log("Got Picture: ");
   res.send("Complete");
   console.log(req.file);
@@ -89,22 +96,14 @@ if (!fs.existsSync("server/guestLists")) {
   });
 }
 
-if (!fs.existsSync("server/pics")) {
-  fs.mkdir("server/pics", err => {
-    if (err) {
-      console.log(err);
-    }
-  });
-}
-
 // When devices connect to the server...
 io.on("connection", function(socket) {
   // log the socket ID of the device
   console.log(socket.id);
 
-  if (fs.existsSync("./server/fileUpload/test.csv")) {
+  if (fs.existsSync("./server/bannedGuestList/test.csv")) {
     csv()
-      .fromFile("./server/fileUpload/test.csv")
+      .fromFile("./server/bannedGuestList/test.csv")
       .then(jsonObj => {
         jsonObj.forEach(index => {
           var hashLic = crypto
@@ -139,15 +138,18 @@ io.on("connection", function(socket) {
     socket.broadcast.emit("receiveUserData", { data });
 
     guestList.push(data.dataStored);
-    new ObjectsToCsv(guestList).toDisk("./guestList_" + eventDate + ".csv", {
-      append: true
-    });
+    new ObjectsToCsv(guestList).toDisk(
+      "server/guestLists/guestList_" + eventDate + ".csv",
+      {
+        append: true
+      }
+    );
     guestList.pop(data.dataStored);
   });
 
-  if (fs.existsSync("./guestList_" + eventDate + ".csv")) {
+  if (fs.existsSync("server/guestLists/guestList_" + eventDate + ".csv")) {
     csv()
-      .fromFile("./guestList_" + eventDate + ".csv")
+      .fromFile("server/guestLists/guestList_" + eventDate + ".csv")
       .then(jsonObj => {
         socket.emit("needGuestList", { jsonObj });
         console.log(jsonObj);
