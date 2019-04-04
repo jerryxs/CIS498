@@ -4,7 +4,15 @@ var server = require("http").Server(app);
 var io = require("socket.io")(server);
 var busboy = require("connect-busboy");
 var multer = require("multer");
-var upload = multer({ dest: "server/pics" });
+var storage = multer.diskStorage({
+  destination: "server/pics",
+  filename: function(req, file, cb) {
+    //req.body is empty...
+    //How could I get the new_file_name property sent from client here?
+    cb(null, file.originalname + "-" + Date.now() + ".jpg");
+  }
+});
+var upload = multer({ storage: storage });
 var fs = require("fs");
 var path = require("path");
 var ObjectsToCsv = require("objects-to-csv");

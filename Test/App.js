@@ -27,7 +27,7 @@ PermissionsAndroid.request(
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
 );
 
-var PicturePath;
+var PicturePath, picName;
 
 //console.disableYellowBox = true;
 
@@ -60,7 +60,7 @@ function storePicture() {
     var data = new FormData();
     data.append("guestPicture", {
       uri: PicturePath,
-      name: "guestPicture",
+      name: picName,
       type: "image/jpg"
     });
 
@@ -322,6 +322,7 @@ export default class App extends Component<Props> {
                 .capture({ metadata: options })
                 .then(data => {
                   PicturePath = data.path;
+                  picName = dataStored.licNum;
                   storePicture();
                 })
                 .catch(err => console.error(err));
